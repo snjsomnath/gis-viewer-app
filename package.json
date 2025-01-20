@@ -1,0 +1,69 @@
+{
+  "name": "gis-viewer-app",
+  "version": "1.0.0",
+  "description": "A simple viewer for GIS files with filtering capabilities.",
+  "main": "src/App.tsx",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "dependencies": {
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
+    "@babel/plugin-proposal-private-methods": "^7.18.6",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@deck.gl/layers": "^9.0.40",
+    "@deck.gl/react": "^9.0.40",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mapbox/mapbox-gl-geocoder": "^5.0.3",
+    "@material-ui/core": "^4.12.4",
+    "@material-ui/icons": "^4.11.3",
+    "@mui/icons-material": "^6.4.0",
+    "@mui/material": "^6.4.0",
+    "@types/mapbox-gl": "^3.4.1",
+    "@types/react": "^17.0.2",
+    "@types/react-dom": "^17.0.2",
+    "d3-scale": "^4.0.2",
+    "d3-scale-chromatic": "^3.1.0",
+    "deck.gl": "^8.9.36",
+    "luxon": "^3.5.0",
+    "mapbox-gl": "^3.9.3",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-map-gl": "^7.1.8",
+    "react-scripts": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/d3-scale": "^4.0.8",
+    "@types/luxon": "^3.4.2",
+    "@types/mapbox__mapbox-gl-geocoder": "^5.0.0",
+    "babel-loader": "^9.2.1",
+    "typescript": "^4.1.2",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.0"
+  },
+  "keywords": [
+    "GIS",
+    "viewer",
+    "react",
+    "deck.gl"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

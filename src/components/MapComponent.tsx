@@ -1,0 +1,135 @@
+import React, { useRef, useEffect, useState } from 'react';
+import { Map, NavigationControl, GeolocateControl } from 'react-map-gl';
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+import DeckGL from '@deck.gl/react'; // Correct import statement
+import { LightingEffect, AmbientLight, _SunLight as SunLight } from '@deck.gl/core';
+import { createLayers } from '../utils/layersConfig';
+import { loadGisData } from '../utils/gisDataLoader';
+import './PopupComponent.css'; // Import the CSS file
+import SunlightSlider from './SunlightSlider'; // Import the new SunlightSlider component
+
+const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN as string;
+
+const ambientLight = new AmbientLight({
+    color: [255, 255, 255],
+    intensity: 0.8 // Reduced intensity for a softer ambient light
+});
+
+const dirLight = new SunLight({
+    timestamp: Date.UTC(2019, 2, 1, 14), // Set default timestamp to March 14:00
+    color: [255, 223, 186], // Warm sunlight color
+    intensity: 1.5, // Increased intensity for a brighter sunlight
+    _shadow: true
+});
+
+const lightingEffect = new LightingEffect({ ambientLight, dirLight });
+lightingEffect.shadowColor = [0, 0, 0, 0.5]; // Softer shadow color
+
+
+const INITIAL_VIEW_STATE = {
+    longitude: 11.964164014667688,
+    latitude: 57.707441012101015,
+    zoom: 16,
+    pitch: 45,
+    bearing: 0,
+};
+
+interface MapComponentProps {
+    initialViewState: {
+        longitude: number;
+        latitude: number;
+        zoom: number;
+        pitch: number;
+        bearing: number;
+    };
+    mapboxAccessToken: string;
+    sunlightTime: number; // Add sunlightTime prop
+}
+
+const MapComponent: React.FC<MapComponentProps> = ({ initialViewState, mapboxAccessToken, sunlightTime }) => {
+    const mapRef = useRef<any>(null);
+    const [gisData, setGisData] = useState(null);
+    const [effects] = useState(() => [lightingEffect]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await loadGisData();
+            setGisData(data);
+        };
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        if (mapRef.current && !mapRef.current.getMap().geocoderAdded) {
+            const geocoder = new MapboxGeocoder({
+                accessToken: mapboxAccessToken,
+                mapboxgl: mapRef.current.getMap(),
+            });
+
+            // Add geocoder only once
+            mapRef.current.getMap().addControl(geocoder, 'top-right');
+            mapRef.current.getMap().geocoderAdded = true;
+        }
+    }, [mapboxAccessToken]);
+
+    useEffect(() => {
+        dirLight.timestamp = sunlightTime; // Update dirLight timestamp
+    }, [sunlightTime]);
+
+    const handleLayerClick = (info: any) => {
+        // Handle layer click if needed
+    };
+
+    const predefinedAttributes = [
+        'name',          // Building or feature name
+        'type',          // Type of feature (e.g., building, landmark)
+        'status',        // Status (e.g., active, under construction)
+        'height',        // Height of the feature in meters
+        'function',      // Building function (e.g., Residential, Office)
+        'floors',        // Number of floors
+        'floor_height',  // Average height of each floor in meters
+        'roof_type',     // Type of roof (e.g., Flat, Gabled)
+        'EPC_class',     // Energy Performance Certificate class
+        'annual_energy', // Annual energy usage in kWh
+        'area'           // Area of the feature in square meters
+    ];
+
+    const getTooltip = (info: { object?: any }) => {
+        const { object } = info;
+        if (!object) return null;
+        const properties = object.properties || {};
+        const tooltipContent = predefinedAttributes.map(attr => {
+            return `${attr}: ${properties[attr] !== undefined ? properties[attr] : 'Not available'}`;
+        }).join('\n');
+        return { text: tooltipContent };
+    };
+
+    const layers = gisData ? createLayers(gisData, handleLayerClick) : [];
+
+    return (
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            <DeckGL
+                initialViewState={initialViewState}
+                controller={true}
+                layers={layers}
+                effects={effects}
+                getTooltip={getTooltip}
+            >
+                <Map
+                    ref={mapRef}
+                    mapboxAccessToken={mapboxAccessToken}
+                    mapStyle="mapbox://styles/mapbox/light-v11"
+                    style={{ width: '100%', height: '100%', position: 'absolute' }}
+                />
+            </DeckGL>
+            <SunlightSlider
+                sunlightTime={sunlightTime}
+                onSliderChange={() => {}}
+            />
+        </div>
+    );
+};
+
+export default MapComponent;
