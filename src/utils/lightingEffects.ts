@@ -1,25 +1,34 @@
 import { LightingEffect, AmbientLight, _SunLight as SunLight } from '@deck.gl/core';
 
 const ambientLight = new AmbientLight({
-    color: [255, 255, 255],
-    intensity: 0.8 // Reduced intensity for a softer ambient light
+    color: [160, 190, 255], // Slightly deeper blue for realistic sky reflection
+    intensity: 2.2 // Stronger ambient light presence
 });
 
 const dirLight = new SunLight({
     timestamp: Date.UTC(2019, 2, 1, 14), // Set default timestamp to March 14:00
-    color: [255, 223, 186], // Warm sunlight color
-    intensity: 1.5, // Increased intensity for a brighter sunlight
+    color: [255, 215, 130], // Warmer and more saturated yellow sunlight
+    intensity: 2.5, // Slightly stronger for a glowing effect
     _shadow: true
 });
 
 const lightingEffect = new LightingEffect({ ambientLight, dirLight });
-lightingEffect.shadowColor = [0, 0, 0, 0.5]; // Softer shadow color
+lightingEffect.shadowColor = [0, 0, 0, 0.3]; // Softer and slightly lighter shadows
 
 export function generateLighting(date: Date) {
+    const hours = date.getUTCHours();
+    const isDaytime = hours >= 6 && hours <= 18;
+
+    const sunlightColor = isDaytime
+        ? [255, 215, 130] // Daytime sunlight: Warm yellow
+        : [150, 150, 200]; // Nighttime: Cooler blue tones
+
+    const sunlightIntensity = isDaytime ? 2.8 : 0.5;
+
     const dirLight = new SunLight({
         timestamp: date.getTime(),
-        color: [255, 255, 255],
-        intensity: 2.0,
+        color: sunlightColor,
+        intensity: sunlightIntensity,
         _shadow: true
     });
 

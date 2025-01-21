@@ -98,7 +98,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ initialViewState, mapboxAcc
                 initialViewState={initialViewState}
                 controller={true}
                 layers={layers}
-                effects={effects}
+                effects={effects} // Ensure lightingEffect is applied
                 getTooltip={getTooltip}
             >
                 <Map
