@@ -24,13 +24,20 @@ import LightingTab from './LightingTab';
 
 interface EnergyDataDrawerProps {
     resetView: () => void;
+    onBasemapChange: (style: string) => void; // Add onBasemapChange prop
 }
 
-const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView }) => {
+const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView, onBasemapChange }) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [basemapStyle, setBasemapStyle] = useState('mapbox://styles/mapbox/streets-v11'); // Add basemapStyle state
 
     const handleListItemClick = (index: number) => {
         setSelectedIndex(index);
+    };
+
+    const handleBasemapChange = (style: string) => {
+        setBasemapStyle(style); // Update basemapStyle state
+        onBasemapChange(style); // Call onBasemapChange prop
     };
 
     const renderContent = () => {
@@ -42,7 +49,7 @@ const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView }) => {
             case 2:
                 return <LayerManagementTab />;
             case 3:
-                return <BasemapTab />;
+                return <BasemapTab onBasemapChange={handleBasemapChange} />; // Pass handleBasemapChange to BasemapTab
             case 4:
                 return <LightingTab />;
             default:

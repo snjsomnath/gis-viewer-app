@@ -1,30 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 
-const BasemapTab: React.FC = () => {
+interface BasemapTabProps {
+    onBasemapChange: (basemapStyle: string) => void;
+}
+
+const BasemapTab: React.FC<BasemapTabProps> = ({ onBasemapChange }) => {
+    const [selectedBasemap, setSelectedBasemap] = useState('mapbox://styles/mapbox/light-v10');
+
     const basemaps = [
-        { id: 'streets', name: 'Streets' },
-        { id: 'satellite', name: 'Satellite' },
-        { id: 'terrain', name: 'Terrain' },
-        { id: 'light', name: 'Light' },
-        { id: 'dark', name: 'Dark' },
+        { id: 'mapbox://styles/mapbox/light-v10', name: 'Light' },
+        { id: 'mapbox://styles/mapbox/satellite-v9', name: 'Satellite' },
+        { id: 'mapbox://styles/mapbox/outdoors-v11', name: 'Terrain' },
+        { id: 'mapbox://styles/mapbox/streets-v11', name: 'Streets' },
+        { id: 'mapbox://styles/mapbox/dark-v10', name: 'Dark' },
     ];
 
     const handleBasemapChange = (event: SelectChangeEvent<string>) => {
-        const selectedBasemap = event.target.value;
-        // Handle basemap change logic here
+        const newBasemap = event.target.value;
+        setSelectedBasemap(newBasemap);
+        onBasemapChange(newBasemap);
     };
 
     return (
         <Box sx={{ p: 2, width: '100%', backgroundColor: '#E0E0E0' }}>
-            <Typography variant="h5" gutterBottom>Basemap Selection</Typography>
+            <Typography variant="h5" gutterBottom>
+                Basemap Selection
+            </Typography>
             <Select
                 fullWidth
+                value={selectedBasemap}
                 onChange={handleBasemapChange}
-                defaultValue={basemaps[0].id}
-                sx={{ backgroundColor: '#FFFFFF', color: '#1E1E2D' }}
+                MenuProps={{
+                    PaperProps: {
+                        style: {
+                            maxHeight: 200, // Adjust height
+                            overflow: 'auto',
+                        },
+                    },
+                }}
+                sx={{
+                    backgroundColor: '#FFFFFF',
+                    color: '#1E1E2D',
+                    '.MuiMenuItem-root': {
+                        display: 'block', // Ensure block display for items
+                    },
+                }}
             >
-                {basemaps.map(basemap => (
+                {basemaps.map((basemap) => (
                     <MenuItem key={basemap.id} value={basemap.id}>
                         {basemap.name}
                     </MenuItem>
@@ -35,5 +58,3 @@ const BasemapTab: React.FC = () => {
 };
 
 export default BasemapTab;
-
-export {};

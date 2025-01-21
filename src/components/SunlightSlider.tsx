@@ -134,4 +134,3 @@ const SunlightSlider: React.FC<SunlightSliderProps> = ({ sunlightTime, onSliderC
 };
 
 export default SunlightSlider;
-export {}

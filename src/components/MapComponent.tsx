@@ -30,12 +30,14 @@ interface MapComponentProps {
     };
     mapboxAccessToken: string;
     sunlightTime: number; // Add sunlightTime prop
+    basemapStyle: string; // Add basemapStyle prop
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ 
     initialViewState,
     mapboxAccessToken,
-    sunlightTime 
+    sunlightTime,
+    basemapStyle // Add basemapStyle prop
 }) => {
     const mapRef = useRef<any>(null);
     const [gisData, setGisData] = useState(null);
@@ -108,7 +110,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                 <Map
                     initialViewState={initialViewState}
                     mapboxAccessToken={mapboxAccessToken}
-                    mapStyle="mapbox://styles/mapbox/dark-v10"
+                    mapStyle={basemapStyle} // Use basemapStyle prop
                     reuseMaps
                 />
             </DeckGL>

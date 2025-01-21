@@ -39,6 +39,7 @@ const MapViewer: React.FC = () => {
     const [sunlightTime, setSunlightTime] = useState(Date.UTC(2019, 2, 1, 14)); // Set default start time to March 14:00
     const [viewState, setViewState] = useState<ViewState>(INITIAL_VIEW_STATE);
     const deckRef = useRef<DeckGLRef>(null);
+    const [basemapStyle, setBasemapStyle] = useState('mapbox://styles/mapbox/streets-v11'); // Add basemapStyle state
 
     useEffect(() => {
         const fetchData = async () => {
@@ -79,11 +80,15 @@ const MapViewer: React.FC = () => {
         }
     };
 
+    const handleBasemapChange = (style: string) => {
+        setBasemapStyle(style); // Update basemapStyle state
+    };
+
     const layers = gisData ? createLayers(gisData, () => {}, sunlightTime) : [];
 
     return (
         <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
-            <EnergyDataDrawer resetView={resetView} />
+            <EnergyDataDrawer resetView={resetView} onBasemapChange={handleBasemapChange} /> {/* Pass handleBasemapChange */}
             <div style={{ flexGrow: 1, position: 'relative' }}>
                 <DeckGL
                     ref={deckRef}
@@ -100,6 +105,7 @@ const MapViewer: React.FC = () => {
                         initialViewState={viewState} // Pass the updated viewState
                         mapboxAccessToken={mapboxgl.accessToken || ''}
                         sunlightTime={sunlightTime}
+                        basemapStyle={basemapStyle} // Pass basemapStyle prop
                     />
                 </DeckGL>
                 <SunlightSlider
