@@ -3,7 +3,7 @@ import MapViewer from './components/MapViewer';
 
 const App: React.FC = () => {
   return (
-    <div>
+    <div id="app-container">
       <MapViewer />
     </div>
   );

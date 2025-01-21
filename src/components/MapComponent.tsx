@@ -4,29 +4,13 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import DeckGL from '@deck.gl/react'; // Correct import statement
-import { LightingEffect, AmbientLight, _SunLight as SunLight } from '@deck.gl/core';
 import { createLayers } from '../utils/layersConfig';
 import { loadGisData } from '../utils/gisDataLoader';
 import './PopupComponent.css'; // Import the CSS file
 import SunlightSlider from './SunlightSlider'; // Import the new SunlightSlider component
+import { lightingEffect, dirLight } from '../utils/lightingEffects';
 
 const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN as string;
-
-const ambientLight = new AmbientLight({
-    color: [255, 255, 255],
-    intensity: 0.8 // Reduced intensity for a softer ambient light
-});
-
-const dirLight = new SunLight({
-    timestamp: Date.UTC(2019, 2, 1, 14), // Set default timestamp to March 14:00
-    color: [255, 223, 186], // Warm sunlight color
-    intensity: 1.5, // Increased intensity for a brighter sunlight
-    _shadow: true
-});
-
-const lightingEffect = new LightingEffect({ ambientLight, dirLight });
-lightingEffect.shadowColor = [0, 0, 0, 0.5]; // Softer shadow color
-
 
 const INITIAL_VIEW_STATE = {
     longitude: 11.964164014667688,
@@ -106,7 +90,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ initialViewState, mapboxAcc
         return { text: tooltipContent };
     };
 
-    const layers = gisData ? createLayers(gisData, handleLayerClick) : [];
+    const layers = gisData ? createLayers(gisData, handleLayerClick, sunlightTime) : [];
 
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>

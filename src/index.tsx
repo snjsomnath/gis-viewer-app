@@ -4,6 +4,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 
+document.title = "GIS Viewer App";
+const link = document.createElement('link');
+link.rel = 'icon';
+link.href = '../../public/favicon.ico';
+document.head.appendChild(link);
+
 ReactDOM.render(
   <React.StrictMode>
     <App />

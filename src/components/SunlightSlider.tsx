@@ -18,8 +18,10 @@ const SunlightSlider: React.FC<SunlightSliderProps> = ({ sunlightTime, onSliderC
     };
 
     const handleDateChange = (event: any, newValue: number | number[]) => {
-        const date = DateTime.fromMillis(newValue as number).setZone('Europe/Stockholm').startOf('day').toMillis();
-        onSliderChange(date);
+        const currentTime = DateTime.fromMillis(sunlightTime).setZone('Europe/Stockholm').diff(DateTime.fromMillis(sunlightTime).setZone('Europe/Stockholm').startOf('day')).toMillis();
+        const newDate = DateTime.fromMillis(newValue as number).setZone('Europe/Stockholm').startOf('day').toMillis();
+        const combinedDateTime = newDate + currentTime;
+        onSliderChange(combinedDateTime);
     };
 
     const handleTimeChange = (event: any, newValue: number | number[]) => {

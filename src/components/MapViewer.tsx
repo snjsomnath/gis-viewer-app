@@ -47,7 +47,7 @@ const MapViewer: React.FC = () => {
         setSunlightTime(newValue);
     };
 
-    const layers = gisData ? createLayers(gisData, () => {}) : [];
+    const layers = gisData ? createLayers(gisData, () => {}, sunlightTime) : [];
 
     return (
         <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
