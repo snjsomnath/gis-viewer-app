@@ -32,7 +32,11 @@ interface MapComponentProps {
     sunlightTime: number; // Add sunlightTime prop
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ initialViewState, mapboxAccessToken, sunlightTime }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ 
+    initialViewState,
+    mapboxAccessToken,
+    sunlightTime 
+}) => {
     const mapRef = useRef<any>(null);
     const [gisData, setGisData] = useState(null);
     const [effects] = useState(() => [lightingEffect]);
@@ -102,10 +106,10 @@ const MapComponent: React.FC<MapComponentProps> = ({ initialViewState, mapboxAcc
                 getTooltip={getTooltip}
             >
                 <Map
-                    ref={mapRef}
+                    initialViewState={initialViewState}
                     mapboxAccessToken={mapboxAccessToken}
-                    mapStyle="mapbox://styles/mapbox/light-v11"
-                    style={{ width: '100%', height: '100%', position: 'absolute' }}
+                    mapStyle="mapbox://styles/mapbox/dark-v10"
+                    reuseMaps
                 />
             </DeckGL>
             <SunlightSlider

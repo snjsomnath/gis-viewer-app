@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import DeckGL from '@deck.gl/react';
+import React, { useState, useEffect, useRef } from 'react';
+import DeckGL, { DeckGLRef } from '@deck.gl/react';
+import { MapView, ViewStateChangeParameters } from '@deck.gl/core';
 import EnergyDataDrawer from './EnergyDataDrawer';
 import MapComponent from './MapComponent';
 import SunlightSlider from './SunlightSlider'; // Import SunlightSlider
@@ -8,18 +9,36 @@ import { createLayers } from '../utils/layersConfig';
 import mapboxgl from 'mapbox-gl';  // Import mapbox-gl
 import { MapboxAccessToken } from '../config/mapbox'; // Assuming this is correctly set
 
-const INITIAL_VIEW_STATE = {
+// Define view state type based on MapView requirements
+interface ViewState {
+    longitude: number;
+    latitude: number;
+    zoom: number;
+    pitch: number;
+    bearing: number;
+    maxZoom?: number;
+    minZoom?: number;
+    maxPitch?: number;
+    minPitch?: number;
+}
+
+const INITIAL_VIEW_STATE: ViewState = {
     longitude: 11.964164014667688,
     latitude: 57.707441012101015,
     zoom: 16,
     pitch: 45,
     bearing: 0,
+    maxZoom: 20,
+    minZoom: 0,
+    maxPitch: 60,
+    minPitch: 0
 };
-
 const MapViewer: React.FC = () => {
     const [gisData, setGisData] = useState<any>(null);
     const [tokenValid, setTokenValid] = useState(false);
     const [sunlightTime, setSunlightTime] = useState(Date.UTC(2019, 2, 1, 14)); // Set default start time to March 14:00
+    const [viewState, setViewState] = useState<ViewState>(INITIAL_VIEW_STATE);
+    const deckRef = useRef<DeckGLRef>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -39,30 +58,48 @@ const MapViewer: React.FC = () => {
         setTokenValid(true);
     }, []);
 
-    if (!tokenValid) {
-        return <div>Error: Invalid or missing Mapbox token</div>;
-    }
+    // if (!tokenValid) {
+    //     return <div>Error: Invalid or missing Mapbox token</div>;
+    // }
 
     const handleSliderChange = (newValue: number) => {
         setSunlightTime(newValue);
+    };
+
+    const resetView = () => {
+        setViewState({ ...INITIAL_VIEW_STATE });
+        if (deckRef.current && deckRef.current.deck) {
+            deckRef.current.deck.setProps({ viewState: INITIAL_VIEW_STATE });
+        }
+    };
+
+    const onViewStateChange = (params: ViewStateChangeParameters) => {
+        if (params.viewState) {
+            setViewState(params.viewState);
+        }
     };
 
     const layers = gisData ? createLayers(gisData, () => {}, sunlightTime) : [];
 
     return (
         <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
-            <EnergyDataDrawer />
+            <EnergyDataDrawer resetView={resetView} />
             <div style={{ flexGrow: 1, position: 'relative' }}>
                 <DeckGL
-                    initialViewState={INITIAL_VIEW_STATE}
-                    controller={true}
+                    ref={deckRef}
+                    views={new MapView({ 
+                        id: 'main',
+                        controller: true 
+                    })}
+                    viewState={viewState}
+                    onViewStateChange={onViewStateChange}
                     layers={layers}
                     style={{ backgroundColor: 'transparent', height: '100%', width: '100%' }}
                 >
                     <MapComponent 
-                        initialViewState={INITIAL_VIEW_STATE}
+                        initialViewState={viewState} // Pass the updated viewState
                         mapboxAccessToken={mapboxgl.accessToken || ''}
-                        sunlightTime={sunlightTime} // Pass sunlightTime to MapComponent
+                        sunlightTime={sunlightTime}
                     />
                 </DeckGL>
                 <SunlightSlider
