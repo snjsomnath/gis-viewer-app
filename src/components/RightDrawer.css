@@ -1,0 +1,48 @@
+.drawer-paper {
+  width: 350px;
+  padding: 16px;
+  border-top-left-radius: 16px;
+  border-bottom-left-radius: 16px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  background-color: #f9f9f9;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+}
+
+.chevron {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #ffffff;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1300;
+}
+
+.chevron:hover {
+  background-color: #f0f0f0;
+}
+
+.chevron-open {
+  right: 350px;
+}
+
+.content {
+  padding: 16px;
+}
+
+.chart-container {
+  margin-top: 16px;
+}
+
+.stat-card {
+  margin-bottom: 16px;
+}
+
+.chart-card {
+  margin-bottom: 16px;
+}

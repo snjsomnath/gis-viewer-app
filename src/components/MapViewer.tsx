@@ -8,6 +8,7 @@ import { loadGisData } from '../utils/gisDataLoader';
 import { createLayers } from '../utils/layersConfig';
 import mapboxgl from 'mapbox-gl';  // Import mapbox-gl
 import { MapboxAccessToken } from '../config/mapbox'; // Assuming this is correctly set
+import RightDrawer from './RightDrawer'; // Import RightDrawer component
 
 // Define view state type based on MapView requirements
 interface ViewState {
@@ -113,6 +114,7 @@ const MapViewer: React.FC = () => {
                     onSliderChange={handleSliderChange}
                 />
             </div>
+            {gisData && <RightDrawer geojsonData={gisData} />} {/* Render RightDrawer only if gisData is not null */}
         </div>
     );
 };
