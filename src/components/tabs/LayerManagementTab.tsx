@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, List, ListItem, ListItemText, IconButton } from '@mui/material';
 import { Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
-
+import { tabContainerStyle } from './TabStyles';
 const LayerManagementTab: React.FC = () => {
     const layers = [
         { id: 1, name: 'Layer 1', visible: true },
@@ -14,7 +14,7 @@ const LayerManagementTab: React.FC = () => {
     };
 
     return (
-        <Box sx={{ p: 2, width: '100%', backgroundColor: '#E0E0E0' }}>
+        <Box sx={tabContainerStyle}>
             <Typography variant="h5" gutterBottom>Layer Management</Typography>
             <List>
                 {layers.map(layer => (

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
+import { tabContainerStyle } from './TabStyles';
 
 const ImportDataTab: React.FC = () => {
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -10,10 +11,14 @@ const ImportDataTab: React.FC = () => {
     };
 
     return (
-        <Box sx={{ p: 2, width: '100%', backgroundColor: '#E0E0E0' }}>
-            <Typography variant="h5" gutterBottom>Import Data</Typography>
+        <Box sx={tabContainerStyle}>
+            <Typography variant="h5" gutterBottom sx={{ color: '#1E1E2D' }}>
+                Import Data
+            </Typography>
             <Box sx={{ border: '2px dashed #ccc', p: 2, textAlign: 'center' }}>
-                <Typography variant="body1" gutterBottom>Drag and drop your geoJSON files here</Typography>
+                <Typography variant="body1" gutterBottom sx={{ color: '#1E1E2D' }}>
+                    Drag and drop your geoJSON files here
+                </Typography>
                 <Button variant="contained" component="label" sx={{ backgroundColor: '#FFFFFF', color: '#1E1E2D' }}>
                     Click to Upload
                     <input type="file" hidden onChange={handleFileUpload} />

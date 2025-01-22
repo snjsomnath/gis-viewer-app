@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Typography, Switch, Slider } from '@mui/material';
+import { tabContainerStyle } from './TabStyles';
 
 const LightingTab: React.FC = () => {
     const [sunlight, setSunlight] = React.useState(true);
@@ -19,17 +20,27 @@ const LightingTab: React.FC = () => {
     };
 
     return (
-        <Box sx={{ p: 2, width: '100%', backgroundColor: '#E0E0E0' }}>
-            <Typography variant="h5" gutterBottom>Lighting Setup</Typography>
+        <Box sx={tabContainerStyle}>
+            <Typography variant="h5" gutterBottom sx={{ color: '#1E1E2D' }}>
+                Lighting Setup
+            </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="body1" sx={{ flexGrow: 1 }}>Sunlight</Typography>
+                <Typography variant="body1" gutterBottom sx={{ flexGrow: 1, color: '#1E1E2D' }}>
+                    Sunlight
+                </Typography>
                 <Switch checked={sunlight} onChange={handleSunlightToggle} sx={{ color: '#FFFFFF' }} />
             </Box>
-            <Typography variant="body1" gutterBottom>Sun Color</Typography>
+            <Typography variant="body1" gutterBottom sx={{ color: '#1E1E2D' }}>
+                Sun Color
+            </Typography>
             <Slider value={sunColor} onChange={handleSliderChange(setSunColor)} sx={{ color: '#FFFFFF' }} />
-            <Typography variant="body1" gutterBottom>Diffuse Color</Typography>
+            <Typography variant="body1" gutterBottom sx={{ color: '#1E1E2D' }}>
+                Diffuse Color
+            </Typography>
             <Slider value={diffuseColor} onChange={handleSliderChange(setDiffuseColor)} sx={{ color: '#FFFFFF' }} />
-            <Typography variant="body1" gutterBottom>Shadow Color</Typography>
+            <Typography variant="body1" gutterBottom sx={{ color: '#1E1E2D' }}>
+                Shadow Color
+            </Typography>
             <Slider value={shadowColor} onChange={handleSliderChange(setShadowColor)} sx={{ color: '#FFFFFF' }} />
             {/* Add live preview of lighting changes here */}
         </Box>

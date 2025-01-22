@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, Select, MenuItem, SelectChangeEvent } from '@mui/material';
+import { tabContainerStyle } from './TabStyles';
 
 interface BasemapTabProps {
     onBasemapChange: (basemapStyle: string) => void;
@@ -23,8 +24,8 @@ const BasemapTab: React.FC<BasemapTabProps> = ({ onBasemapChange }) => {
     };
 
     return (
-        <Box sx={{ p: 2, width: '100%', backgroundColor: '#E0E0E0' }}>
-            <Typography variant="h5" gutterBottom>
+        <Box sx={tabContainerStyle}>
+            <Typography variant="h5" gutterBottom sx={{ color: '#1E1E2D' }}>
                 Basemap Selection
             </Typography>
             <Select

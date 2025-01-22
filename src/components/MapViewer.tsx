@@ -39,7 +39,7 @@ const MapViewer: React.FC = () => {
     const [sunlightTime, setSunlightTime] = useState(Date.UTC(2019, 2, 1, 14)); // Set default start time to March 14:00
     const [viewState, setViewState] = useState<ViewState>(INITIAL_VIEW_STATE);
     const deckRef = useRef<DeckGLRef>(null);
-    const [basemapStyle, setBasemapStyle] = useState('mapbox://styles/mapbox/streets-v11'); // Add basemapStyle state
+    const [basemapStyle, setBasemapStyle] = useState('mapbox://styles/mapbox/light-v10'); // Add basemapStyle state
 
     useEffect(() => {
         const fetchData = async () => {

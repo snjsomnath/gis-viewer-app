@@ -16,46 +16,37 @@ import {
     Description as DescriptionIcon,
     Build as BuildIcon,
 } from '@mui/icons-material';
-import HomeTab from './HomeTab';
-import ImportDataTab from './ImportDataTab';
-import LayerManagementTab from './LayerManagementTab';
-import BasemapTab from './BasemapTab';
-import LightingTab from './LightingTab';
+import HomeTab from './tabs/HomeTab';
+import ImportDataTab from './tabs/ImportDataTab';
+import LayerManagementTab from './tabs/LayerManagementTab';
+import BasemapTab from './tabs/BasemapTab';
+import LightingTab from './tabs/LightingTab';
 
 interface EnergyDataDrawerProps {
     resetView: () => void;
-    onBasemapChange: (style: string) => void; // Add onBasemapChange prop
+    onBasemapChange: (style: string) => void;
 }
 
 const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView, onBasemapChange }) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
-    const [basemapStyle, setBasemapStyle] = useState('mapbox://styles/mapbox/streets-v11'); // Add basemapStyle state
+    const [basemapStyle, setBasemapStyle] = useState('mapbox://styles/mapbox/light-v10');
 
     const handleListItemClick = (index: number) => {
         setSelectedIndex(index);
     };
 
     const handleBasemapChange = (style: string) => {
-        setBasemapStyle(style); // Update basemapStyle state
-        onBasemapChange(style); // Call onBasemapChange prop
+        setBasemapStyle(style);
+        onBasemapChange(style);
     };
 
-    const renderContent = () => {
-        switch (selectedIndex) {
-            case 0:
-                return <HomeTab resetView={resetView} />;
-            case 1:
-                return <ImportDataTab />;
-            case 2:
-                return <LayerManagementTab />;
-            case 3:
-                return <BasemapTab onBasemapChange={handleBasemapChange} />; // Pass handleBasemapChange to BasemapTab
-            case 4:
-                return <LightingTab />;
-            default:
-                return <HomeTab resetView={resetView} />;
-        }
-    };
+    const tabs = [
+        { component: <HomeTab resetView={resetView} />, icon: <HomeIcon fontSize="large" />, tooltip: "Home" },
+        { component: <ImportDataTab />, icon: <CloudUploadIcon fontSize="large" />, tooltip: "Import Data" },
+        { component: <LayerManagementTab />, icon: <EditIcon fontSize="large" />, tooltip: "Layer Management" },
+        { component: <BasemapTab onBasemapChange={handleBasemapChange} />, icon: <DescriptionIcon fontSize="large" />, tooltip: "Basemap" },
+        { component: <LightingTab />, icon: <BuildIcon fontSize="large" />, tooltip: "Lighting" },
+    ];
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -74,84 +65,33 @@ const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView, onBasema
                     },
                 }}
             >
-                <Box sx={{ display: 'flex', justifyContent: 'centre', alignItems: 'centre', p: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', p: 1 }}>
                     <Typography variant="h6" noWrap sx={{ color: '#FFFFFF', ml: 1 }}>CSD</Typography>
                 </Box>
 
                 <Divider sx={{ backgroundColor: '#444' }} />
 
-                {/* Navigation */}
                 <List>
-                    <Tooltip title="Home" placement="right">
-                        <ListItemButton
-                            selected={selectedIndex === 0}
-                            onClick={() => handleListItemClick(0)}
-                            disableGutters
-                            sx={{ justifyContent: 'center' }}
-                        >
-                            <ListItemIcon sx={{ color: '#FFFFFF', minWidth: 'auto' }}>
-                                <HomeIcon fontSize="large" />
-                            </ListItemIcon>
-                        </ListItemButton>
-                    </Tooltip>
-
-                    <Tooltip title="Import Data" placement="right">
-                        <ListItemButton
-                            selected={selectedIndex === 1}
-                            onClick={() => handleListItemClick(1)}
-                            disableGutters
-                            sx={{ justifyContent: 'center' }}
-                        >
-                            <ListItemIcon sx={{ color: '#FFFFFF', minWidth: 'auto' }}>
-                                <CloudUploadIcon fontSize="large" />
-                            </ListItemIcon>
-                        </ListItemButton>
-                    </Tooltip>
-
-                    <Tooltip title="Layer Management" placement="right">
-                        <ListItemButton
-                            selected={selectedIndex === 2}
-                            onClick={() => handleListItemClick(2)}
-                            disableGutters
-                            sx={{ justifyContent: 'center' }}
-                        >
-                            <ListItemIcon sx={{ color: '#FFFFFF', minWidth: 'auto' }}>
-                                <EditIcon fontSize="large" />
-                            </ListItemIcon>
-                        </ListItemButton>
-                    </Tooltip>
-
-                    <Tooltip title="Basemap" placement="right">
-                        <ListItemButton
-                            selected={selectedIndex === 3}
-                            onClick={() => handleListItemClick(3)}
-                            disableGutters
-                            sx={{ justifyContent: 'center' }}
-                        >
-                            <ListItemIcon sx={{ color: '#FFFFFF', minWidth: 'auto' }}>
-                                <DescriptionIcon fontSize="large" />
-                            </ListItemIcon>
-                        </ListItemButton>
-                    </Tooltip>
-
-                    <Tooltip title="Lighting" placement="right">
-                        <ListItemButton
-                            selected={selectedIndex === 4}
-                            onClick={() => handleListItemClick(4)}
-                            disableGutters
-                            sx={{ justifyContent: 'center' }}
-                        >
-                            <ListItemIcon sx={{ color: '#FFFFFF', minWidth: 'auto' }}>
-                                <BuildIcon fontSize="large" />
-                            </ListItemIcon>
-                        </ListItemButton>
-                    </Tooltip>
+                    {tabs.map((tab, index) => (
+                        <Tooltip key={index} title={tab.tooltip} placement="right">
+                            <ListItemButton
+                                selected={selectedIndex === index}
+                                onClick={() => handleListItemClick(index)}
+                                disableGutters
+                                sx={{ justifyContent: 'center' }}
+                            >
+                                <ListItemIcon sx={{ color: '#FFFFFF', minWidth: 'auto' }}>
+                                    {tab.icon}
+                                </ListItemIcon>
+                            </ListItemButton>
+                        </Tooltip>
+                    ))}
                 </List>
 
                 <Divider sx={{ backgroundColor: '#444' }} />
             </Drawer>
             <Box component="main" sx={{ flexGrow: 1, p: 3, backgroundColor: '#E0E0E0' }}>
-                {renderContent()}
+                {tabs[selectedIndex].component}
             </Box>
         </Box>
     );
