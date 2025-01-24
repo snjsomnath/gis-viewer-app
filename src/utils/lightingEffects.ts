@@ -19,7 +19,7 @@ export function generateLighting(date: Date) {
     const hours = date.getUTCHours();
     const isDaytime = hours >= 6 && hours <= 18;
 
-    const sunlightColor = isDaytime
+    const sunlightColor: [number, number, number] = isDaytime
         ? [255, 215, 130] // Daytime sunlight: Warm yellow
         : [150, 150, 200]; // Nighttime: Cooler blue tones
 
