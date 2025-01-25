@@ -25,12 +25,9 @@ export function generateLighting(date: Date) {
 
     const sunlightIntensity = isDaytime ? 2.8 : 0.5;
 
-    const dirLight = new SunLight({
-        timestamp: date.getTime(),
-        color: sunlightColor,
-        intensity: sunlightIntensity,
-        _shadow: true
-    });
+    dirLight.timestamp = date.getTime();
+    dirLight.color = sunlightColor;
+    dirLight.intensity = sunlightIntensity;
 
     return new LightingEffect({
         ambientLight,

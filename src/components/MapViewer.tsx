@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import DeckGL, { DeckGLRef } from '@deck.gl/react';
-import { MapView, ViewStateChangeParameters } from '@deck.gl/core';
+import { MapView, ViewStateChangeParameters, Layer as DeckLayer } from '@deck.gl/core'; // Import Layer as DeckLayer
 import EnergyDataDrawer from './EnergyDataDrawer';
 import MapComponent from './MapComponent';
 import SunlightSlider from './SunlightSlider'; // Import SunlightSlider
-import { loadGisData } from '../utils/gisDataLoader';
-import { createLayers } from '../utils/layersConfig';
+import { loadGisData, loadTreeData } from '../utils/gisDataLoader'; // Import loadTreeData
+import { createLayers, createTreeLayer } from '../utils/layersConfig'; // Import createTreeLayer
 import mapboxgl from 'mapbox-gl';  // Import mapbox-gl
 import { MapboxAccessToken } from '../config/mapbox'; // Assuming this is correctly set
 import RightDrawer from './RightDrawer'; // Import RightDrawer component
@@ -34,6 +34,7 @@ const INITIAL_VIEW_STATE: ViewState = {
     maxPitch: 60,
     minPitch: 0
 };
+
 const MapViewer: React.FC = () => {
     const [gisData, setGisData] = useState<any>(null);
     const [tokenValid, setTokenValid] = useState(false);
@@ -41,6 +42,12 @@ const MapViewer: React.FC = () => {
     const [viewState, setViewState] = useState<ViewState>(INITIAL_VIEW_STATE);
     const deckRef = useRef<DeckGLRef>(null);
     const [basemapStyle, setBasemapStyle] = useState('mapbox://styles/mapbox/light-v10'); // Add basemapStyle state
+    const [treeData, setTreeData] = useState<any>(null);
+    const [layerVisibility, setLayerVisibility] = useState<{ [key: string]: boolean }>({
+        buildings: true,
+        'land-cover': true,
+        'tree-layer': true
+    });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -48,6 +55,14 @@ const MapViewer: React.FC = () => {
             setGisData(data);
         };
         fetchData();
+    }, []);
+
+    useEffect(() => {
+        const fetchTreeData = async () => {
+            const data = await loadTreeData();
+            setTreeData(data);
+        };
+        fetchTreeData();
     }, []);
 
     useEffect(() => {
@@ -59,10 +74,6 @@ const MapViewer: React.FC = () => {
         mapboxgl.accessToken = token;
         setTokenValid(true);
     }, []);
-
-    // if (!tokenValid) {
-    //     return <div>Error: Invalid or missing Mapbox token</div>;
-    // }
 
     const handleSliderChange = (newValue: number) => {
         setSunlightTime(newValue);
@@ -85,11 +96,32 @@ const MapViewer: React.FC = () => {
         setBasemapStyle(style); // Update basemapStyle state
     };
 
-    const layers = gisData ? createLayers(gisData, () => {}, sunlightTime) : [];
+    const handleVisibilityToggle = (layerId: string) => {
+        setLayerVisibility(prevState => ({
+            ...prevState,
+            [layerId]: !prevState[layerId]
+        }));
+        const layer = layers.find(layer => layer.id === layerId);
+        if (layer) {
+            layer.props.visible = !layer.props.visible;
+        }
+    };
+
+    const layers: DeckLayer[] = gisData ? [
+        ...createLayers(gisData, () => {}, sunlightTime).filter(layer => layer && layerVisibility[layer.id]) as DeckLayer[],
+        ...(treeData ? [createTreeLayer(treeData, 'tree-layer') as DeckLayer] : [])
+    ] : [];
+
+    console.log('Layers:', layers); // Add this line
 
     return (
         <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
-            <EnergyDataDrawer resetView={resetView} onBasemapChange={handleBasemapChange} /> {/* Pass handleBasemapChange */}
+            <EnergyDataDrawer 
+                resetView={resetView} 
+                onBasemapChange={handleBasemapChange} 
+                layers={layers} 
+                onVisibilityToggle={handleVisibilityToggle} 
+            /> {/* Pass handleBasemapChange */}
             <div style={{ flexGrow: 1, position: 'relative' }}>
                 <DeckGL
                     ref={deckRef}

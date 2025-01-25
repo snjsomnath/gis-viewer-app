@@ -4,7 +4,7 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import DeckGL from '@deck.gl/react'; // Correct import statement
-import { createLayers } from '../utils/layersConfig';
+import { createLayers, createTreeLayer } from '../utils/layersConfig';
 import { loadGisData } from '../utils/gisDataLoader';
 import './PopupComponent.css'; // Import the CSS file
 import SunlightSlider from './SunlightSlider'; // Import the new SunlightSlider component
@@ -41,6 +41,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 }) => {
     const mapRef = useRef<any>(null);
     const [gisData, setGisData] = useState(null);
+    const [treeData, setTreeData] = useState(null); // Add state for tree data
     const [effects] = useState(() => [lightingEffect]);
 
     useEffect(() => {
@@ -96,7 +97,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
         return { text: tooltipContent };
     };
 
-    const layers = gisData ? createLayers(gisData, handleLayerClick, sunlightTime) : [];
+    const layers = gisData ? [
+        ...createLayers(gisData, handleLayerClick, sunlightTime)
+    ] : [];
+
+    console.log('Layers:', layers); // Add this line
 
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>

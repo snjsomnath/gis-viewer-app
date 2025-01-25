@@ -1,5 +1,6 @@
 // filepath: /d:/GitHub/CSD_viewer/gis-viewer-app/src/utils/layersConfig.ts
 import { GeoJsonLayer } from '@deck.gl/layers';
+import { ScenegraphLayer } from '@deck.gl/mesh-layers';
 import { DateTime } from 'luxon';
 import { Feature, Polygon } from 'geojson';
 
@@ -31,6 +32,31 @@ const generateBoundingBox = (data: any): Feature<Polygon> => {
       footprint_extrusion: 0
     }
   };
+};
+
+const createTreeLayer = (data: any, id: string = 'tree-layer') => {
+  console.log('Creating tree layer with data:', data); // Existing log
+  if (!data || !Array.isArray(data.features)) {
+    console.error('Invalid data format for ScenegraphLayer:', data);
+    return null;
+  }
+  return new ScenegraphLayer({
+      id,
+      data,
+      scenegraph: '/tree.glb', // Ensure this path is correct
+      getPosition: (d: any) => {
+        console.log('Tree position:', d.geometry.coordinates);
+        return d.geometry.coordinates;
+      },
+      getOrientation: [0, 0, 0],
+      getScale: [1, 1, 1],
+      sizeScale: 1,
+      pickable: true,
+      _lighting: 'pbr',
+      onError: (error) => {
+        console.error('Error loading scenegraph model:', error);
+      }
+  });
 };
 
 export const createLayers = (gisData: any, handleLayerClick: (info: any) => void, sunlightTime: number) => {
@@ -80,4 +106,6 @@ export const createLayers = (gisData: any, handleLayerClick: (info: any) => void
         pickable: false
       })
     ];
-  };
+};
+
+export { createTreeLayer };

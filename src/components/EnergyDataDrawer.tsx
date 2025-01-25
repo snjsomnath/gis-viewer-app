@@ -21,13 +21,16 @@ import ImportDataTab from './tabs/ImportDataTab';
 import LayerManagementTab from './tabs/LayerManagementTab';
 import BasemapTab from './tabs/BasemapTab';
 import LightingTab from './tabs/LightingTab';
+import { Layer as DeckLayer } from '@deck.gl/core'; // Import Layer from deck.gl/core
 
 interface EnergyDataDrawerProps {
     resetView: () => void;
     onBasemapChange: (style: string) => void;
+    layers: DeckLayer[]; // Use DeckLayer directly
+    onVisibilityToggle: (id: string) => void;
 }
 
-const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView, onBasemapChange }) => {
+const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView, onBasemapChange, layers, onVisibilityToggle }) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [basemapStyle, setBasemapStyle] = useState('mapbox://styles/mapbox/light-v10');
 
@@ -43,7 +46,7 @@ const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView, onBasema
     const tabs = [
         { component: <HomeTab resetView={resetView} />, icon: <HomeIcon fontSize="large" />, tooltip: "Home" },
         { component: <ImportDataTab />, icon: <CloudUploadIcon fontSize="large" />, tooltip: "Import Data" },
-        { component: <LayerManagementTab />, icon: <EditIcon fontSize="large" />, tooltip: "Layer Management" },
+        { component: <LayerManagementTab layers={layers} onVisibilityToggle={onVisibilityToggle} />, icon: <EditIcon fontSize="large" />, tooltip: "Layer Management" },
         { component: <BasemapTab onBasemapChange={handleBasemapChange} />, icon: <DescriptionIcon fontSize="large" />, tooltip: "Basemap" },
         { component: <LightingTab />, icon: <BuildIcon fontSize="large" />, tooltip: "Lighting" },
     ];
