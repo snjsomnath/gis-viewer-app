@@ -7,7 +7,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // Fetch the GeoJSON data
-    fetch('/path/to/geojson')
+    fetch('sample-date.geojson')
       .then(response => response.json())
       .then(data => setGeojsonData(data));
   }, []);
@@ -15,6 +15,7 @@ const App: React.FC = () => {
   return (
     <div id="app-container">
       <MapViewer />
+      
       {geojsonData && <RightDrawer geojsonData={geojsonData} />}
     </div>
   );

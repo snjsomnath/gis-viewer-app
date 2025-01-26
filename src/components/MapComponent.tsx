@@ -67,6 +67,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         dirLight.timestamp = sunlightTime;
     }, [sunlightTime]);
 
+
     const handleLayerClick = (info: any) => {
         // Handle layer click if needed
     };
@@ -102,6 +103,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                 layers={layers}
                 effects={effects}
                 getTooltip={getTooltip}
+                useDevicePixels={true}
             >
                 {showBasemap && (
                     <Map

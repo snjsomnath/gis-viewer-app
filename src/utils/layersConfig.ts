@@ -43,36 +43,36 @@ const generateBoundingBox = (data: any): Feature<Polygon> => {
   };
 };
 
-// const createTreeLayer = (data: any, id: string = 'tree-layer') => {
-//   const layer = new ScenegraphLayer({
-//       id,
-//       data,
-//       scenegraph: 'tree.glb',
-//       getPosition: (d: any) => d.geometry.coordinates,
-//       getOrientation: (d: any) => [0, Math.random() * 180, 90],
-//       sizeScale: 5, // Scale multiplier
-//       pickable: true,
-//       _lighting: 'flat'
-//   });
-//   return layer;
-// };
-
 const createTreeLayer = (data: any, id: string = 'tree-layer') => {
   const layer = new ScenegraphLayer({
-    id,
-    data,
-    getPosition: (d: any) => d.geometry.coordinates,
-    getOrientation: (d: any) => [0, Math.random() * 180, 90],
-    scenegraph: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxAnimated/glTF-Binary/BoxAnimated.glb',
-    sizeScale: 500,
-    _animations: {
-      '*': {speed: 5}
-    },
-    _lighting: 'pbr',
-    pickable: true
+      id,
+      data,
+      scenegraph: 'tree.glb',
+      getPosition: (d: any) => d.geometry.coordinates,
+      getOrientation: (d: any) => [0, Math.random() * 180, 90],
+      sizeScale: 5, // Scale multiplier
+      pickable: true,
+      _lighting: 'flat'
   });
-return layer;
+  return layer;
 };
+
+// const createTreeLayer = (data: any, id: string = 'tree-layer') => {
+//   const layer = new ScenegraphLayer({
+//     id,
+//     data,
+//     getPosition: (d: any) => d.geometry.coordinates,
+//     getOrientation: (d: any) => [0, Math.random() * 180, 90],
+//     scenegraph: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxAnimated/glTF-Binary/BoxAnimated.glb',
+//     sizeScale: 500,
+//     _animations: {
+//       '*': {speed: 5}
+//     },
+//     _lighting: 'pbr',
+//     pickable: true
+//   });
+// return layer;
+// };
 
 const createTreePointsLayer = (data: any, id: string = 'tree-points-layer') => {
     return new GeoJsonLayer({
@@ -149,8 +149,8 @@ export const createLayers = (gisData: any,treeData: any, handleLayerClick: (info
   return [
     createBuildingLayer(gisData, handleLayerClick, timeOfDay, colorBy),
     createLandCoverLayer(gisData),
-    createTreeLayer(treeData),
     createTreePointsLayer(treeData),
+    createTreeLayer(treeData),
   ];
 };
 
