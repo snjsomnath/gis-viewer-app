@@ -7,7 +7,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // Fetch the GeoJSON data
-    fetch('sample-date.geojson')
+    fetch('/sample-date.geojson')
       .then(response => response.json())
       .then(data => setGeojsonData(data));
   }, []);

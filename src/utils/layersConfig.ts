@@ -44,17 +44,24 @@ const generateBoundingBox = (data: any): Feature<Polygon> => {
 };
 
 const createTreeLayer = (data: any, id: string = 'tree-layer') => {
-  const layer = new ScenegraphLayer({
-      id,
-      data,
-      scenegraph: 'tree.glb',
-      getPosition: (d: any) => d.geometry.coordinates,
-      getOrientation: (d: any) => [0, Math.random() * 180, 90],
-      sizeScale: 5, // Scale multiplier
-      pickable: true,
-      _lighting: 'flat'
-  });
-  return layer;
+    console.log('Creating Tree Layer with data:', data);
+    const layer = new ScenegraphLayer({
+        id,
+        data,
+        scenegraph: '/tree.glb',
+        getPosition: (d: any) => {
+            console.log('Tree position:', d.geometry.coordinates);
+            return d.geometry.coordinates;
+        },
+        getOrientation: (d: any) => [0, Math.random() * 180, 90],
+        sizeScale: 5, // Scale multiplier
+        pickable: true,
+        _lighting: 'flat',
+        onError: (error) => {
+            console.error('Error loading ScenegraphLayer:', error);
+        }
+    });
+    return layer;
 };
 
 // const createTreeLayer = (data: any, id: string = 'tree-layer') => {

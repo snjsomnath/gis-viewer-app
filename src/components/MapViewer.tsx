@@ -8,6 +8,7 @@ import { loadGisData, loadTreeData } from '../utils/gisDataLoader';
 import mapboxgl from 'mapbox-gl';
 import { MapboxAccessToken } from '../config/mapbox';
 import RightDrawer from './RightDrawer';
+import Stats from 'stats.js';
 
 // Initialising an interface for the view state so we can use it later
 interface ViewState {
@@ -52,6 +53,7 @@ const MapViewer: React.FC = () => {
         'tree-points-layer': true // Add tree-points-layer
     });
     const [showBasemap, setShowBasemap] = useState(true); // Add showBasemap state
+    const stats = useRef<Stats | null>(null);
 
     // A useeffect is used to load the GIS data when the component is mounted
     // By using async/await we can wait for the data to be loaded before setting the state
@@ -82,6 +84,24 @@ const MapViewer: React.FC = () => {
         setTokenValid(true);
     }, []);
 
+    useEffect(() => {
+        if (process.env.NODE_ENV === 'development') {
+            stats.current = new Stats();
+            stats.current.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+            stats.current.dom.style.position = 'fixed';
+            stats.current.dom.style.top = '0px';
+            stats.current.dom.style.left = '50%';
+            stats.current.dom.style.transform = 'translateX(-50%)';
+            stats.current.dom.style.zIndex = '100000';
+            document.body.appendChild(stats.current.dom);
+            const animate = () => {
+                stats.current?.begin();
+                stats.current?.end();
+                requestAnimationFrame(animate);
+            };
+            requestAnimationFrame(animate);
+        }
+    }, []);
 
     // Function to handle the slider change for the sunlight time
     const handleSliderChange = (newValue: number) => {

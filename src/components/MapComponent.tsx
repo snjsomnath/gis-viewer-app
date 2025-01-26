@@ -1,13 +1,14 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Map, NavigationControl, GeolocateControl } from 'react-map-gl';
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+//import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-geocoder.css';
 import DeckGL from '@deck.gl/react';
 import { createLayers, createTreeLayer } from '../utils/layersConfig';
 import { lightingEffect, dirLight } from '../utils/lightingEffects';
 import './PopupComponent.css';
 import SunlightSlider from './SunlightSlider';
+import Stats from 'stats.js';
 
 const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN as string;
 
@@ -50,23 +51,42 @@ const MapComponent: React.FC<MapComponentProps> = ({
 }) => {
     const mapRef = useRef<any>(null);
     const [effects] = useState(() => [lightingEffect]);
+    const stats = useRef<Stats | null>(null);
 
-    useEffect(() => {
-        if (mapRef.current && !mapRef.current.getMap().geocoderAdded) {
-            const geocoder = new MapboxGeocoder({
-                accessToken: mapboxAccessToken,
-                mapboxgl: mapRef.current.getMap(),
-            });
+    // useEffect(() => {
+    //     if (mapRef.current && !mapRef.current.getMap().geocoderAdded) {
+    //         const geocoder = new MapboxGeocoder({
+    //             accessToken: mapboxAccessToken,
+    //             mapboxgl: mapRef.current.getMap(),
+    //         });
 
-            mapRef.current.getMap().addControl(geocoder, 'top-right');
-            mapRef.current.getMap().geocoderAdded = true;
-        }
-    }, [mapboxAccessToken]);
+    //         mapRef.current.getMap().addControl(geocoder, 'top-right');
+    //         mapRef.current.getMap().geocoderAdded = true;
+    //     }
+    // }, [mapboxAccessToken]);
 
     useEffect(() => {
         dirLight.timestamp = sunlightTime;
     }, [sunlightTime]);
 
+    useEffect(() => {
+        if (process.env.NODE_ENV === 'development') {
+            stats.current = new Stats();
+            stats.current.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+            stats.current.dom.style.position = 'fixed';
+            stats.current.dom.style.top = '0px';
+            stats.current.dom.style.left = '50%';
+            stats.current.dom.style.transform = 'translateX(-50%)';
+            stats.current.dom.style.zIndex = '100000';
+            document.body.appendChild(stats.current.dom);
+            const animate = () => {
+                stats.current?.begin();
+                stats.current?.end();
+                requestAnimationFrame(animate);
+            };
+            requestAnimationFrame(animate);
+        }
+    }, []);
 
     const handleLayerClick = (info: any) => {
         // Handle layer click if needed
