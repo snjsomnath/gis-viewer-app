@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import DeckGL, { DeckGLRef } from '@deck.gl/react';
-import { MapView, ViewStateChangeParameters, Layer as DeckLayer } from '@deck.gl/core'; // Import Layer as DeckLayer
+import { MapView, ViewStateChangeParameters } from '@deck.gl/core';
 import EnergyDataDrawer from './EnergyDataDrawer';
 import MapComponent from './MapComponent';
-import SunlightSlider from './SunlightSlider'; // Import SunlightSlider
-import { loadGisData, loadTreeData } from '../utils/gisDataLoader'; // Import loadTreeData
-import { createLayers, createTreeLayer } from '../utils/layersConfig'; // Import createTreeLayer
-import mapboxgl from 'mapbox-gl';  // Import mapbox-gl
-import { MapboxAccessToken } from '../config/mapbox'; // Assuming this is correctly set
-import RightDrawer from './RightDrawer'; // Import RightDrawer component
+import SunlightSlider from './SunlightSlider';
+import { loadGisData, loadTreeData } from '../utils/gisDataLoader';
+import mapboxgl from 'mapbox-gl';
+import { MapboxAccessToken } from '../config/mapbox';
+import RightDrawer from './RightDrawer';
 
-// Define view state type based on MapView requirements
+// Initialising an interface for the view state so we can use it later
 interface ViewState {
     longitude: number;
     latitude: number;
@@ -23,6 +22,7 @@ interface ViewState {
     minPitch?: number;
 }
 
+// Initial view state for the map
 const INITIAL_VIEW_STATE: ViewState = {
     longitude: 11.964164014667688,
     latitude: 57.707441012101015,
@@ -35,20 +35,26 @@ const INITIAL_VIEW_STATE: ViewState = {
     minPitch: 0
 };
 
+// Main component for the map viewer
 const MapViewer: React.FC = () => {
     const [gisData, setGisData] = useState<any>(null);
     const [tokenValid, setTokenValid] = useState(false);
-    const [sunlightTime, setSunlightTime] = useState(Date.UTC(2019, 2, 1, 14)); // Set default start time to March 14:00
+    const [sunlightTime, setSunlightTime] = useState(Date.UTC(2019, 2, 1, 14));
     const [viewState, setViewState] = useState<ViewState>(INITIAL_VIEW_STATE);
     const deckRef = useRef<DeckGLRef>(null);
-    const [basemapStyle, setBasemapStyle] = useState('mapbox://styles/mapbox/light-v10'); // Add basemapStyle state
-    const [treeData, setTreeData] = useState<any>(null);
+    const [basemapStyle, setBasemapStyle] = useState('mapbox://styles/mapbox/light-v10');
+    const [treeData, setTreeData] = useState<any>(null); // For scenegraph tree data
+    const [treePointsData, setTreePointsData] = useState<any>(null); // Add state for tree points data
     const [layerVisibility, setLayerVisibility] = useState<{ [key: string]: boolean }>({
         buildings: true,
         'land-cover': true,
-        'tree-layer': true
+        'tree-layer': true,
+        'tree-points-layer': true // Add tree-points-layer
     });
+    const [showBasemap, setShowBasemap] = useState(true); // Add showBasemap state
 
+    // A useeffect is used to load the GIS data when the component is mounted
+    // By using async/await we can wait for the data to be loaded before setting the state
     useEffect(() => {
         const fetchData = async () => {
             const data = await loadGisData();
@@ -61,6 +67,7 @@ const MapViewer: React.FC = () => {
         const fetchTreeData = async () => {
             const data = await loadTreeData();
             setTreeData(data);
+            setTreePointsData(data); // Set tree points data
         };
         fetchTreeData();
     }, []);
@@ -75,10 +82,13 @@ const MapViewer: React.FC = () => {
         setTokenValid(true);
     }, []);
 
+
+    // Function to handle the slider change for the sunlight time
     const handleSliderChange = (newValue: number) => {
         setSunlightTime(newValue);
     };
 
+    // Function to reset the view state
     const resetView = () => {
         setViewState({ ...INITIAL_VIEW_STATE });
         if (deckRef.current && deckRef.current.deck) {
@@ -93,7 +103,7 @@ const MapViewer: React.FC = () => {
     };
 
     const handleBasemapChange = (style: string) => {
-        setBasemapStyle(style); // Update basemapStyle state
+        setBasemapStyle(style);
     };
 
     const handleVisibilityToggle = (layerId: string) => {
@@ -101,27 +111,23 @@ const MapViewer: React.FC = () => {
             ...prevState,
             [layerId]: !prevState[layerId]
         }));
-        const layer = layers.find(layer => layer.id === layerId);
-        if (layer) {
-            layer.props.visible = !layer.props.visible;
-        }
     };
 
-    const layers: DeckLayer[] = gisData ? [
-        ...createLayers(gisData, () => {}, sunlightTime).filter(layer => layer && layerVisibility[layer.id]) as DeckLayer[],
-        ...(treeData ? [createTreeLayer(treeData, 'tree-layer') as DeckLayer] : [])
-    ] : [];
+    const toggleBasemap = () => {
+        setShowBasemap(prevState => !prevState);
+    };
 
-    console.log('Layers:', layers); // Add this line
 
+    // Finally, the main return statement for the component
+    // This will render the EnergyDataDrawer, DeckGL component, SunlightSlider, and a button to toggle the basemap
     return (
         <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
             <EnergyDataDrawer 
                 resetView={resetView} 
                 onBasemapChange={handleBasemapChange} 
-                layers={layers} 
+                layers={[]} 
                 onVisibilityToggle={handleVisibilityToggle} 
-            /> {/* Pass handleBasemapChange */}
+            />
             <div style={{ flexGrow: 1, position: 'relative' }}>
                 <DeckGL
                     ref={deckRef}
@@ -131,22 +137,29 @@ const MapViewer: React.FC = () => {
                     })}
                     viewState={viewState}
                     onViewStateChange={onViewStateChange}
-                    layers={layers}
                     style={{ backgroundColor: 'transparent', height: '100%', width: '100%' }}
                 >
                     <MapComponent 
-                        initialViewState={viewState} // Pass the updated viewState
+                        initialViewState={viewState}
                         mapboxAccessToken={mapboxgl.accessToken || ''}
                         sunlightTime={sunlightTime}
-                        basemapStyle={basemapStyle} // Pass basemapStyle prop
+                        basemapStyle={basemapStyle}
+                        gisData={gisData}
+                        treeData={treeData}
+                        layerVisibility={layerVisibility} // Pass layer visibility
+                        showBasemap={showBasemap} // Pass showBasemap prop
+                        treePointsData={treeData} // Pass tree points data
                     />
                 </DeckGL>
                 <SunlightSlider
                     sunlightTime={sunlightTime}
                     onSliderChange={handleSliderChange}
                 />
+                <button onClick={toggleBasemap} style={{ position: 'absolute', top: 10, right: 10 }}>
+                    Toggle Basemap
+                </button>
             </div>
-            {gisData && <RightDrawer geojsonData={gisData} />} {/* Render RightDrawer only if gisData is not null */}
+            {gisData && <RightDrawer geojsonData={gisData} />}
         </div>
     );
 };

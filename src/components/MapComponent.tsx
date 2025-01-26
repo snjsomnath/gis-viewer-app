@@ -3,12 +3,11 @@ import { Map, NavigationControl, GeolocateControl } from 'react-map-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
-import DeckGL from '@deck.gl/react'; // Correct import statement
+import DeckGL from '@deck.gl/react';
 import { createLayers, createTreeLayer } from '../utils/layersConfig';
-import { loadGisData } from '../utils/gisDataLoader';
-import './PopupComponent.css'; // Import the CSS file
-import SunlightSlider from './SunlightSlider'; // Import the new SunlightSlider component
 import { lightingEffect, dirLight } from '../utils/lightingEffects';
+import './PopupComponent.css';
+import SunlightSlider from './SunlightSlider';
 
 const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN as string;
 
@@ -29,28 +28,28 @@ interface MapComponentProps {
         bearing: number;
     };
     mapboxAccessToken: string;
-    sunlightTime: number; // Add sunlightTime prop
-    basemapStyle: string; // Add basemapStyle prop
+    sunlightTime: number;
+    basemapStyle: string;
+    gisData: any;
+    treeData: any;
+    layerVisibility: { [key: string]: boolean };
+    showBasemap: boolean; // Add showBasemap prop
+    treePointsData: any; // Add treePointsData prop
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ 
     initialViewState,
     mapboxAccessToken,
     sunlightTime,
-    basemapStyle // Add basemapStyle prop
+    basemapStyle,
+    gisData,
+    treeData,
+    layerVisibility,
+    showBasemap, // Add showBasemap prop
+    treePointsData // Add treePointsData prop
 }) => {
     const mapRef = useRef<any>(null);
-    const [gisData, setGisData] = useState(null);
-    const [treeData, setTreeData] = useState(null); // Add state for tree data
     const [effects] = useState(() => [lightingEffect]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await loadGisData();
-            setGisData(data);
-        };
-        fetchData();
-    }, []);
 
     useEffect(() => {
         if (mapRef.current && !mapRef.current.getMap().geocoderAdded) {
@@ -59,14 +58,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
                 mapboxgl: mapRef.current.getMap(),
             });
 
-            // Add geocoder only once
             mapRef.current.getMap().addControl(geocoder, 'top-right');
             mapRef.current.getMap().geocoderAdded = true;
         }
     }, [mapboxAccessToken]);
 
     useEffect(() => {
-        dirLight.timestamp = sunlightTime; // Update dirLight timestamp
+        dirLight.timestamp = sunlightTime;
     }, [sunlightTime]);
 
     const handleLayerClick = (info: any) => {
@@ -74,17 +72,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     };
 
     const predefinedAttributes = [
-        'name',          // Building or feature name
-        'type',          // Type of feature (e.g., building, landmark)
-        'status',        // Status (e.g., active, under construction)
-        'height',        // Height of the feature in meters
-        'function',      // Building function (e.g., Residential, Office)
-        'floors',        // Number of floors
-        'floor_height',  // Average height of each floor in meters
-        'roof_type',     // Type of roof (e.g., Flat, Gabled)
-        'EPC_class',     // Energy Performance Certificate class
-        'annual_energy', // Annual energy usage in kWh
-        'area'           // Area of the feature in square meters
+        'name', 'type', 'status', 'height', 'function', 'floors', 'floor_height', 'roof_type', 'EPC_class', 'annual_energy', 'area'
     ];
 
     const getTooltip = (info: { object?: any }) => {
@@ -97,11 +85,14 @@ const MapComponent: React.FC<MapComponentProps> = ({
         return { text: tooltipContent };
     };
 
-    const layers = gisData ? [
-        ...createLayers(gisData, handleLayerClick, sunlightTime)
-    ] : [];
+    // Set the colorBy layer to 'xx' for the buildings
+    const colorBy = 'function';
 
-    console.log('Layers:', layers); // Add this line
+    const layers = gisData ? createLayers(gisData, treeData, handleLayerClick, sunlightTime, colorBy).filter(layer => 
+        layerVisibility[layer.id]
+    ) : [];
+
+    //console.log('Layers passed to DeckGL:', layers); // Add log
 
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -109,15 +100,17 @@ const MapComponent: React.FC<MapComponentProps> = ({
                 initialViewState={initialViewState}
                 controller={true}
                 layers={layers}
-                effects={effects} // Ensure lightingEffect is applied
+                effects={effects}
                 getTooltip={getTooltip}
             >
-                <Map
-                    initialViewState={initialViewState}
-                    mapboxAccessToken={mapboxAccessToken}
-                    mapStyle={basemapStyle} // Use basemapStyle prop
-                    reuseMaps
-                />
+                {showBasemap && (
+                    <Map
+                        initialViewState={initialViewState}
+                        mapboxAccessToken={mapboxAccessToken}
+                        mapStyle={basemapStyle}
+                        reuseMaps
+                    />
+                )}
             </DeckGL>
             <SunlightSlider
                 sunlightTime={sunlightTime}

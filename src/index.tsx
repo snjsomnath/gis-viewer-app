@@ -7,8 +7,9 @@ import App from './App';
 document.title = "GIS Viewer App";
 const link = document.createElement('link');
 link.rel = 'icon';
-link.href = '../../public/favicon.ico';
+link.href = 'favicon.ico';
 document.head.appendChild(link);
+
 
 ReactDOM.render(
   <React.StrictMode>

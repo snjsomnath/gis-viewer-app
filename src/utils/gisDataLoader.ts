@@ -21,6 +21,7 @@ export const loadTreeData = async () => {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        //console.log('Loaded tree data:', data); // Add log to verify data
         return data;
     } catch (error) {
         console.error('Error loading tree GeoJSON data:', error);
