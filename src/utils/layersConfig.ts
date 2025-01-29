@@ -4,11 +4,11 @@ import { ScenegraphLayer } from '@deck.gl/mesh-layers';
 import { DateTime } from 'luxon';
 import { Feature, Polygon } from 'geojson';
 import { getColorFromValue, getColormapForVariable } from './colormapHelpers';
-import {GLTFLoader} from '@loaders.gl/gltf';
+import { GLTFLoader, postProcessGLTF } from '@loaders.gl/gltf';
+import { load } from '@loaders.gl/core';
 import { SimpleMeshLayer } from '@deck.gl/mesh-layers';
 import { registerLoaders } from '@loaders.gl/core';
 import { CubeGeometry } from '@luma.gl/engine';
-
 
 // Register the GLTF loader
 registerLoaders([GLTFLoader]);
@@ -43,7 +43,10 @@ const generateBoundingBox = (data: any): Feature<Polygon> => {
   };
 };
 
-const createTreeLayer = (data: any, id: string = 'tree-layer') => {
+
+
+
+const createTreeLayer = async (data: any, id: string = 'tree-layer') => {
   console.log('Creating Tree Layer with data:', data);
 
   if (!data || !Array.isArray(data.features)) {
@@ -51,18 +54,37 @@ const createTreeLayer = (data: any, id: string = 'tree-layer') => {
       return null; // Prevents layer creation if data is invalid
   }
 
+  const scenegraph = 'tree.glb';
+
   const layer = new ScenegraphLayer({
       id,
       data: data.features, // Ensure it's passing an array of features
-      scenegraph: 'tree.glb',
-      getPosition: (d: any) => {
-          console.log('Tree position:', d.geometry?.coordinates); // Log tree position
-          return d.geometry?.coordinates || [0, 0, 0]; // Ensure valid default value
+      scenegraph,
+
+      // Set position using geo-coordinates
+      getPosition: (d: any) => d.geometry?.coordinates || [0, 0, 0],
+
+      // Fix tree angles by ensuring upright orientation
+      getOrientation: (d: any) => {
+          return [0, Math.random() * 10 - 5, 90]; // Slight rotation only on Y-axis
       },
-      getOrientation: (d: any) => [0, Math.random() * 180, 90],
-      sizeScale: 1, // Scale multiplier
-      pickable: true,
+
+      // Apply natural size variation
+      getScale: (d: any) => {
+          const randomScale = 0.8 + Math.random() * 0.3; // Scale between 0.9 and 1.2
+          return [randomScale, randomScale, randomScale]; 
+      },
+
+      sizeScale: 1, // Base scale multiplier
+
+      // Enable picking interactions
+      pickable: false,
+      getColor: [150, 200, 150, 255], // Default color
+
+      // Use realistic PBR lighting
       _lighting: 'pbr',
+
+
       onError: (error: any) => {
           console.error('Error loading ScenegraphLayer:', error);
       }
@@ -84,8 +106,6 @@ const createTreePointsLayer = (data: any, id: string = 'tree-points-layer') => {
 
     });
 };
-
-
 
 const createBuildingLayer = (
   gisData: any,
@@ -124,7 +144,6 @@ const createBuildingLayer = (
   });
 };
 
-
 const createLandCoverLayer = (gisData: any) => {
   const landCover = generateBoundingBox(gisData);
   return new GeoJsonLayer({
@@ -136,13 +155,11 @@ const createLandCoverLayer = (gisData: any) => {
   });
 };
 
-
-export const createLayers = (gisData: any,treeData: any, handleLayerClick: (info: any) => void, sunlightTime: number, colorBy: string) => {
+export const createLayers = (gisData: any, treeData: any, handleLayerClick: (info: any) => void, sunlightTime: number, colorBy: string) => {
   const date = DateTime.fromMillis(sunlightTime).setZone('Europe/Stockholm');
   const sunrise = date.startOf('day').plus({ hours: 6 });
   const sunset = date.startOf('day').plus({ hours: 18 });
   const timeOfDay = date > sunrise && date < sunset ? "day" : "night";
-
 
   return [
     createBuildingLayer(gisData, handleLayerClick, timeOfDay, colorBy),

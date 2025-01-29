@@ -41,6 +41,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 }) => {
     const mapRef = useRef<any>(null);
     const stats = useRef<Stats | null>(null);
+    const [layers, setLayers] = useState<any[]>([]);
 
     // Memoize lighting effects to prevent re-rendering
     const effects = useMemo(() => [lightingEffect], []);
@@ -76,11 +77,17 @@ const MapComponent: React.FC<MapComponentProps> = ({
         // Custom click handler logic
     }, []);
 
-    // Memoize layers to prevent re-creating them on every render
-    const layers = useMemo(() => {
-        if (!gisData) return [];
-        return createLayers(gisData, treeData, handleLayerClick, sunlightTime, 'function')
-            .filter(layer => layer && layerVisibility[layer.id]); // Add null check for layer
+    // Update layers when gisData, treeData, or other dependencies change
+    useEffect(() => {
+        if (!gisData) return;
+
+        const updateLayers = async () => {
+            const layerPromises = createLayers(gisData, treeData, handleLayerClick, sunlightTime, 'function');
+            const resolvedLayers = await Promise.all(layerPromises);
+            setLayers(resolvedLayers.filter(layer => layer && layerVisibility[layer.id])); // Added null check for layer
+        };
+
+        updateLayers();
     }, [gisData, treeData, sunlightTime, layerVisibility, handleLayerClick]);
 
     // Memoize tooltip function to prevent re-renders
@@ -103,7 +110,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
             <DeckGL
                 initialViewState={initialViewState}
                 controller={true}
-                layers={layers} // ✅ Now memoized
+                layers={layers} // ✅ Now stored in state
                 effects={effects} // ✅ Now memoized
                 getTooltip={getTooltip} // ✅ Now memoized
                 useDevicePixels={true}
