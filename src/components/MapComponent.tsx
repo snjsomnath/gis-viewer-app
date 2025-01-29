@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Map, NavigationControl, GeolocateControl } from 'react-map-gl';
 //import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-geocoder.css';
+//import '@mapbox/mapbox-gl-geocoder/dist/mapbox-geocoder.css';
 import DeckGL from '@deck.gl/react';
 import { createLayers, createTreeLayer } from '../utils/layersConfig';
 import { lightingEffect, dirLight } from '../utils/lightingEffects';
