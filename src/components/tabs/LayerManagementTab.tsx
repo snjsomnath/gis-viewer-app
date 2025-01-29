@@ -2,23 +2,29 @@ import React from 'react';
 import { Box, Typography, List, ListItem, ListItemText, IconButton } from '@mui/material';
 import { Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
 import { tabContainerStyle } from './TabStyles';
-import { Layer as DeckLayer } from '@deck.gl/core'; // Import Layer from deck.gl/core
 
 interface LayerManagementTabProps {
-    layers: DeckLayer[];
+    layers: { id: string, visible: boolean }[];
     onVisibilityToggle: (id: string) => void;
 }
 
 const LayerManagementTab: React.FC<LayerManagementTabProps> = ({ layers, onVisibilityToggle }) => {
+    const predefinedLayers = [
+        { id: 'buildings', name: 'Buildings' },
+        { id: 'land-cover', name: 'Land Cover' },
+        { id: 'tree-layer', name: 'Tree Layer' },
+        { id: 'tree-points-layer', name: 'Tree Points Layer' }
+    ];
+
     return (
         <Box sx={tabContainerStyle}>
             <Typography variant="h5" gutterBottom>Layer Management</Typography>
             <List>
-                {layers.map(layer => (
+                {predefinedLayers.map(layer => (
                     <ListItem key={layer.id}>
-                        <ListItemText primary={layer.id} />
+                        <ListItemText primary={layer.name} />
                         <IconButton onClick={() => onVisibilityToggle(layer.id)} sx={{ color: '#FFFFFF' }}>
-                            {layer.props.visible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                            {layers.find(l => l.id === layer.id)?.visible ? <VisibilityIcon /> : <VisibilityOffIcon />}
                         </IconButton>
                     </ListItem>
                 ))}

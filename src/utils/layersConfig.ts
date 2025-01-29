@@ -57,7 +57,7 @@ const createTreeLayer = (data: any, id: string = 'tree-layer') => {
         sizeScale: 5, // Scale multiplier
         pickable: true,
         _lighting: 'flat',
-        onError: (error) => {
+        onError: (error: any) => {
             console.error('Error loading ScenegraphLayer:', error);
         }
     });

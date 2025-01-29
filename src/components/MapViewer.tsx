@@ -145,7 +145,7 @@ const MapViewer: React.FC = () => {
             <EnergyDataDrawer 
                 resetView={resetView} 
                 onBasemapChange={handleBasemapChange} 
-                layers={[]} 
+                layers={Object.keys(layerVisibility).map(id => ({ id, visible: layerVisibility[id] }))} 
                 onVisibilityToggle={handleVisibilityToggle} 
             />
             <div style={{ flexGrow: 1, position: 'relative' }}>
