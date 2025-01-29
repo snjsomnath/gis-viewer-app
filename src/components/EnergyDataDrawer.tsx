@@ -21,7 +21,7 @@ import ImportDataTab from './tabs/ImportDataTab';
 import LayerManagementTab from './tabs/LayerManagementTab';
 import BasemapTab from './tabs/BasemapTab';
 import LightingTab from './tabs/LightingTab';
-import { Layer as DeckLayer } from '@deck.gl/core'; // Import Layer from deck.gl/core
+import { Layer as DeckLayer } from '@deck.gl/core'; 
 
 interface LayerWithVisibility extends DeckLayer {
     visible: boolean;
