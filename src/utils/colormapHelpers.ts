@@ -104,7 +104,7 @@ export const applyColormap = (
     const colormap = getColormap(colormapName);
 
     // Normalize value to [0, 1] range
-    const normalizedValue = (value - min) / (max - min);
+    const normalizedValue = (value - min) / (max - max);
 
     // Clamp the normalized value to the [0, 1] range to handle outliers
     const clampedValue = Math.max(0, Math.min(1, normalizedValue));
@@ -129,7 +129,7 @@ export const applyColormap = (
 
 export const applyCategoricalColormap = (value: any, colormapName: string): [number, number, number, number] => {
     if (colormapName === 'EPC') {
-        const color = EPC_COLORS[value] || '#000000'; // Default to black if not found
+        const color = EPC_COLORS[value] || '#808080'; // Default to gray if not found
         const [r, g, b] = color.match(/\w\w/g)!.map(hex => parseInt(hex, 16));
         return [r, g, b, globalAlpha];
     }

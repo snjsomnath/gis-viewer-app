@@ -54,6 +54,8 @@ const MapViewer: React.FC = () => {
     const [treeData, setTreeData] = useState<any>(null);
     const [treePointsData, setTreePointsData] = useState<any>(null);
     const [showBasemap, setShowBasemap] = useState(true);
+    
+    const [colorBy, setColorBy] = useState<string>(''); // Set default value to empty string
 
     const [layerVisibility, setLayerVisibility] = useState<{ [key: string]: boolean }>(() => ({
         buildings: true,
@@ -149,6 +151,11 @@ const MapViewer: React.FC = () => {
         setShowBasemap(prevState => !prevState);
     }, []);
 
+    const handleColorByChange = useCallback((colorBy: string) => {
+        console.log('Color by changed to:', colorBy); // Add this line
+        setColorBy(colorBy); // Update state when colorBy changes
+    }, []);
+
     return (
         <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
             <EnergyDataDrawer 
@@ -156,6 +163,7 @@ const MapViewer: React.FC = () => {
                 onBasemapChange={handleBasemapChange} 
                 layers={Object.keys(layerVisibility).map(id => ({ id, visible: layerVisibility[id] } as LayerWithVisibility))} 
                 onVisibilityToggle={handleVisibilityToggle} 
+                onColorByChange={handleColorByChange} // Add this line
             />
             <div style={{ flexGrow: 1, position: 'relative' }}>
                 <DeckGL
@@ -175,6 +183,7 @@ const MapViewer: React.FC = () => {
                         layerVisibility={layerVisibility}
                         showBasemap={showBasemap}
                         treePointsData={treeData}
+                        colorBy={colorBy} // Pass colorBy to MapComponent
                     />
                 </DeckGL>
                 <SunlightSlider sunlightTime={sunlightTime} onSliderChange={handleSliderChange} />

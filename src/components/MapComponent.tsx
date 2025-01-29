@@ -26,6 +26,7 @@ interface MapComponentProps {
     layerVisibility: { [key: string]: boolean };
     showBasemap: boolean;
     treePointsData: any;
+    colorBy: string; // Add this line
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ 
@@ -37,7 +38,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
     treeData,
     layerVisibility,
     showBasemap,
-    treePointsData
+    treePointsData,
+    colorBy // Add this line
 }) => {
     const mapRef = useRef<any>(null);
     const stats = useRef<Stats | null>(null);
@@ -82,13 +84,15 @@ const MapComponent: React.FC<MapComponentProps> = ({
         if (!gisData) return;
 
         const updateLayers = async () => {
-            const layerPromises = createLayers(gisData, treeData, handleLayerClick, sunlightTime, 'function');
+            console.log('Updating layers with colorBy:', colorBy); // Add this line
+            const layerPromises = createLayers(gisData, treeData, handleLayerClick, sunlightTime, colorBy); // Pass colorBy
             const resolvedLayers = await Promise.all(layerPromises);
+            console.log('Resolved layers:', resolvedLayers); // Add this line
             setLayers(resolvedLayers.filter(layer => layer && layerVisibility[layer.id])); // Added null check for layer
         };
 
         updateLayers();
-    }, [gisData, treeData, sunlightTime, layerVisibility, handleLayerClick]);
+    }, [gisData, treeData, sunlightTime, layerVisibility, handleLayerClick, colorBy]); // Add colorBy to dependencies
 
     // Memoize tooltip function to prevent re-renders
     const getTooltip = useCallback((info: { object?: any }) => {

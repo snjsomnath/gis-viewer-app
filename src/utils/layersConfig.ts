@@ -43,9 +43,6 @@ const generateBoundingBox = (data: any): Feature<Polygon> => {
   };
 };
 
-
-
-
 const createTreeLayer = async (data: any, id: string = 'tree-layer') => {
   console.log('Creating Tree Layer with data:', data);
 
@@ -84,7 +81,6 @@ const createTreeLayer = async (data: any, id: string = 'tree-layer') => {
       // Use realistic PBR lighting
       _lighting: 'pbr',
 
-
       onError: (error: any) => {
           console.error('Error loading ScenegraphLayer:', error);
       }
@@ -111,8 +107,10 @@ const createBuildingLayer = (
   gisData: any,
   handleLayerClick: (info: any) => void,
   timeOfDay: string,
-  colorBy: string
+  colorBy: string // Ensure colorBy is received
 ) => {
+  console.log('Creating Building Layer with colorBy:', colorBy); // Add this line
+
   // Compute min and max for numerical attributes
   const min = Math.min(...gisData.features.map((f: any) => f.properties[colorBy] || 0));
   const max = Math.max(...gisData.features.map((f: any) => f.properties[colorBy] || 0));
@@ -127,7 +125,7 @@ const createBuildingLayer = (
     getFillColor: (d: any) => {
       if (d.properties.isFloor) return [0, 0, 0, 0];
       const value = d.properties[colorBy];
-      if (value == null) return [200, 200, 200, 100]; // Default color for missing values
+      if (value == null || colorBy === '') return [128, 128, 128, 100]; // Default gray color for missing values
 
       const isCategorical = typeof value === "string";
       return getColorFromValue(value, colorBy, isCategorical, min, max);
@@ -140,7 +138,10 @@ const createBuildingLayer = (
     },
     _shadows: true,
     pickable: true,
-    onClick: handleLayerClick
+    onClick: handleLayerClick,
+    updateTriggers: {
+      getFillColor: colorBy // Add this line
+    }
   });
 };
 
@@ -156,17 +157,21 @@ const createLandCoverLayer = (gisData: any) => {
 };
 
 export const createLayers = (gisData: any, treeData: any, handleLayerClick: (info: any) => void, sunlightTime: number, colorBy: string) => {
+  console.log('Creating layers with colorBy:', colorBy); // Add this line
   const date = DateTime.fromMillis(sunlightTime).setZone('Europe/Stockholm');
   const sunrise = date.startOf('day').plus({ hours: 6 });
   const sunset = date.startOf('day').plus({ hours: 18 });
   const timeOfDay = date > sunrise && date < sunset ? "day" : "night";
 
-  return [
+  const layers = [
     createBuildingLayer(gisData, handleLayerClick, timeOfDay, colorBy),
     createLandCoverLayer(gisData),
     createTreePointsLayer(treeData),
     createTreeLayer(treeData),
   ];
+
+  console.log('Layers created:', layers); // Add this line
+  return layers;
 };
 
 export { createTreeLayer, createTreePointsLayer };

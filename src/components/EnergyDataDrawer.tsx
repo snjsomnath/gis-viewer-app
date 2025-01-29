@@ -10,11 +10,11 @@ import {
     ListItemIcon,
 } from '@mui/material';
 import {
-    Home as HomeIcon,
-    CloudUpload as CloudUploadIcon,
-    Edit as EditIcon,
-    Description as DescriptionIcon,
-    Build as BuildIcon,
+    Dashboard as DashboardIcon,
+    FileUpload as FileUploadIcon,
+    Layers as LayersIcon,
+    Map as MapIcon,
+    WbSunny as WbSunnyIcon,
 } from '@mui/icons-material';
 import HomeTab from './tabs/HomeTab';
 import ImportDataTab from './tabs/ImportDataTab';
@@ -32,9 +32,10 @@ interface EnergyDataDrawerProps {
     onBasemapChange: (style: string) => void;
     layers: LayerWithVisibility[]; // Use LayerWithVisibility
     onVisibilityToggle: (id: string) => void;
+    onColorByChange: (colorBy: string) => void;
 }
 
-const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView, onBasemapChange, layers, onVisibilityToggle }) => {
+const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView, onBasemapChange, layers, onVisibilityToggle, onColorByChange }) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [basemapStyle, setBasemapStyle] = useState('mapbox://styles/mapbox/light-v10');
 
@@ -48,11 +49,11 @@ const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView, onBasema
     };
 
     const tabs = [
-        { component: <HomeTab resetView={resetView} />, icon: <HomeIcon fontSize="large" />, tooltip: "Home" },
-        { component: <ImportDataTab />, icon: <CloudUploadIcon fontSize="large" />, tooltip: "Import Data" },
-        { component: <LayerManagementTab layers={layers} onVisibilityToggle={onVisibilityToggle} />, icon: <EditIcon fontSize="large" />, tooltip: "Layer Management" },
-        { component: <BasemapTab onBasemapChange={handleBasemapChange} />, icon: <DescriptionIcon fontSize="large" />, tooltip: "Basemap" },
-        { component: <LightingTab />, icon: <BuildIcon fontSize="large" />, tooltip: "Lighting" },
+        { component: <HomeTab resetView={resetView} />, icon: <DashboardIcon fontSize="large" />, tooltip: "Home" },
+        { component: <ImportDataTab />, icon: <FileUploadIcon fontSize="large" />, tooltip: "Import Data" },
+        { component: <LayerManagementTab layers={layers} onVisibilityToggle={onVisibilityToggle} onColorByChange={onColorByChange} />, icon: <LayersIcon fontSize="large" />, tooltip: "Layer Management" },
+        { component: <BasemapTab onBasemapChange={handleBasemapChange} />, icon: <MapIcon fontSize="large" />, tooltip: "Basemap" },
+        { component: <LightingTab />, icon: <WbSunnyIcon fontSize="large" />, tooltip: "Lighting" },
     ];
 
     return (

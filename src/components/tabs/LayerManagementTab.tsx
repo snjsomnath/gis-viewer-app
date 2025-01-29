@@ -1,6 +1,13 @@
-import React from 'react';
-import { Box, Typography, List, ListItem, ListItemText, IconButton } from '@mui/material';
-import { Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
+import React, { useState } from 'react';
+import { 
+    Box, Typography, List, ListItem, ListItemText, IconButton, Collapse, 
+    Select, MenuItem, FormControl, InputLabel 
+} from '@mui/material';
+import { 
+    Visibility as VisibilityIcon, 
+    VisibilityOff as VisibilityOffIcon, 
+    ExpandMore, ExpandLess 
+} from '@mui/icons-material';
 import { tabContainerStyle } from './TabStyles';
 
 interface LayerWithVisibility {
@@ -11,9 +18,14 @@ interface LayerWithVisibility {
 interface LayerManagementTabProps {
     layers: LayerWithVisibility[];
     onVisibilityToggle: (id: string) => void;
+    onColorByChange: (colorBy: string) => void;
 }
 
-const LayerManagementTab: React.FC<LayerManagementTabProps> = ({ layers, onVisibilityToggle }) => {
+const LayerManagementTab: React.FC<LayerManagementTabProps> = ({ layers, onVisibilityToggle, onColorByChange }) => {
+    const [visibilityExpanded, setVisibilityExpanded] = useState(true);
+    const [buildingsExpanded, setBuildingsExpanded] = useState(false);
+    const [colorBy, setColorBy] = useState(''); // Set default value to empty string
+
     const predefinedLayers = [
         { id: 'buildings', name: 'Buildings' },
         { id: 'land-cover', name: 'Land Cover' },
@@ -21,20 +33,70 @@ const LayerManagementTab: React.FC<LayerManagementTabProps> = ({ layers, onVisib
         { id: 'tree-points-layer', name: 'Tree Points Layer' }
     ];
 
+    const eligibleAttributes = [
+        'type', 'status', 'height', 'function', 'floors', 
+        'floor_height', 'roof_type', 'EPC_class', 'annual_energy', 'area'
+    ];
+
+    const handleColorByChange = (event: any) => {
+        const variable = event.target.value;
+        console.log('Selected color by attribute:', variable); // Add this line
+        setColorBy(variable);
+        onColorByChange(variable);
+    };
+
     return (
         <Box sx={tabContainerStyle}>
-            <Typography variant="h5" gutterBottom>Layer Management</Typography>
-            <List>
-                {predefinedLayers.map(layer => (
-                    <ListItem key={layer.id}>
-                        <ListItemText primary={layer.name} />
-                        <IconButton onClick={() => onVisibilityToggle(layer.id)} sx={{ color: '#FFFFFF' }}>
-                            {layers.find(l => l.id === layer.id)?.visible ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                        </IconButton>
-                    </ListItem>
-                ))}
-            </List>
-            {/* Add drag-and-drop reordering and styling options here */}
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
+                Layer Management
+            </Typography>
+            
+            {/* Layer Visibility Section */}
+            <Box mb={2}>
+                <Typography 
+                    variant="h6" 
+                    onClick={() => setVisibilityExpanded(!visibilityExpanded)} 
+                    sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', fontWeight: 'bold' }}
+                >
+                    Layer Visibility {visibilityExpanded ? <ExpandLess /> : <ExpandMore />}
+                </Typography>
+                <Collapse in={visibilityExpanded} timeout="auto" unmountOnExit>
+                    <List>
+                        {predefinedLayers.map(layer => (
+                            <ListItem key={layer.id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <ListItemText primary={layer.name} sx={{ fontWeight: 500 }} />
+                                <IconButton 
+                                    onClick={() => onVisibilityToggle(layer.id)}
+                                    sx={{ color: layers.find(l => l.id === layer.id)?.visible ? '#4CAF50' : '#CCC' }}
+                                >
+                                    {layers.find(l => l.id === layer.id)?.visible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                </IconButton>
+                            </ListItem>
+                        ))}
+                    </List>
+                </Collapse>
+            </Box>
+
+            {/* Buildings Section */}
+            <Box>
+                <Typography 
+                    variant="h6" 
+                    onClick={() => setBuildingsExpanded(!buildingsExpanded)} 
+                    sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', fontWeight: 'bold' }}
+                >
+                    Buildings {buildingsExpanded ? <ExpandLess /> : <ExpandMore />}
+                </Typography>
+                <Collapse in={buildingsExpanded} timeout="auto" unmountOnExit>
+                    <FormControl fullWidth margin="normal" sx={{ mt: 2 }}>
+                        <InputLabel sx={{ mb: 1 }}>Color By</InputLabel>
+                        <Select value={colorBy} onChange={handleColorByChange}>
+                            {eligibleAttributes.map(attr => (
+                                <MenuItem key={attr} value={attr}>{attr}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Collapse>
+            </Box>
         </Box>
     );
 };
