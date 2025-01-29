@@ -9,6 +9,7 @@ import mapboxgl from 'mapbox-gl';
 import { MapboxAccessToken } from '../config/mapbox';
 import RightDrawer from './RightDrawer';
 import Stats from 'stats.js';
+import { Layer } from '@deck.gl/core'; // Ensure you import the correct Layer type
 
 // Initialising an interface for the view state so we can use it later
 interface ViewState {
@@ -21,6 +22,10 @@ interface ViewState {
     minZoom?: number;
     maxPitch?: number;
     minPitch?: number;
+}
+
+interface LayerWithVisibility extends Layer {
+    visible: boolean;
 }
 
 // Initial view state for the map
@@ -145,7 +150,7 @@ const MapViewer: React.FC = () => {
             <EnergyDataDrawer 
                 resetView={resetView} 
                 onBasemapChange={handleBasemapChange} 
-                layers={Object.keys(layerVisibility).map(id => ({ id, visible: layerVisibility[id] }))} 
+                layers={Object.keys(layerVisibility).map(id => ({ id, visible: layerVisibility[id] } as LayerWithVisibility))} 
                 onVisibilityToggle={handleVisibilityToggle} 
             />
             <div style={{ flexGrow: 1, position: 'relative' }}>

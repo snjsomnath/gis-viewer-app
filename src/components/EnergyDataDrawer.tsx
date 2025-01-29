@@ -23,10 +23,14 @@ import BasemapTab from './tabs/BasemapTab';
 import LightingTab from './tabs/LightingTab';
 import { Layer as DeckLayer } from '@deck.gl/core'; // Import Layer from deck.gl/core
 
+interface LayerWithVisibility extends DeckLayer {
+    visible: boolean;
+}
+
 interface EnergyDataDrawerProps {
     resetView: () => void;
     onBasemapChange: (style: string) => void;
-    layers: DeckLayer[]; // Use DeckLayer directly
+    layers: LayerWithVisibility[]; // Use LayerWithVisibility
     onVisibilityToggle: (id: string) => void;
 }
 

@@ -3,8 +3,13 @@ import { Box, Typography, List, ListItem, ListItemText, IconButton } from '@mui/
 import { Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
 import { tabContainerStyle } from './TabStyles';
 
+interface LayerWithVisibility {
+    id: string;
+    visible: boolean;
+}
+
 interface LayerManagementTabProps {
-    layers: { id: string, visible: boolean }[];
+    layers: LayerWithVisibility[];
     onVisibilityToggle: (id: string) => void;
 }
 
