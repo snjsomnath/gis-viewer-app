@@ -8,11 +8,11 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-} from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import CloseIcon from '@material-ui/icons/Close';
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import CloseIcon from '@mui/icons-material/Close';
 import AreaChart from './charts/AreaChart';
 import HeightChart from './charts/HeightChart';
 import FunctionChart from './charts/FunctionChart';

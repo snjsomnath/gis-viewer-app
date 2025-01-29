@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Collapse, FormControlLabel, Switch, Select, MenuItem, Paper, Tooltip, IconButton } from '@material-ui/core';
-import { ExpandMore, ExpandLess, Layers } from '@material-ui/icons';
+import { Collapse, FormControlLabel, Switch, Select, MenuItem, Paper, Tooltip, IconButton, SelectChangeEvent } from '@mui/material';
+import { ExpandMore, ExpandLess, Layers } from '@mui/icons-material';
 
 interface LayerSettingsProps {
     layers: any[];
@@ -35,13 +35,13 @@ const LayerSettings: React.FC<LayerSettingsProps> = ({ layers, onToggleLayer, on
         onToggleLayer(layerId, newState);
     };
 
-    const handleVariableChange = (layerId: string, event: React.ChangeEvent<{ value: unknown }>) => {
+    const handleVariableChange = (layerId: string, event: SelectChangeEvent<string>) => {
         const variable = event.target.value as string;
         setSelectedVariables({ ...selectedVariables, [layerId]: variable });
         onVariableChange(layerId, variable);
     };
 
-    const handleColormapChange = (layerId: string, event: React.ChangeEvent<{ value: unknown }>) => {
+    const handleColormapChange = (layerId: string, event: SelectChangeEvent<string>) => {
         const colormap = event.target.value as string;
         setSelectedColormaps({ ...selectedColormaps, [layerId]: colormap });
         onColormapChange(layerId, colormap);

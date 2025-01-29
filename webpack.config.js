@@ -1,4 +1,5 @@
-// filepath: /d:/GitHub/CSD_viewer/gis-viewer-app/webpack.config.js
+// eslint-disable-next-line import/no-extraneous-dependencies
+
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -24,9 +25,9 @@ module.exports = {
       },
       {
         test: /\.js$/,
-        enforce: 'pre',
         use: ['source-map-loader'],
-        exclude: /node_modules\/wgsl_reflect/,
+        enforce: 'pre',
+        exclude: /node_modules\/wgsl_reflect/, // Ignore this package
       },
     ],
   },

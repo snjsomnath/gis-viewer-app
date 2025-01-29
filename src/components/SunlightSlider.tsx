@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { Slider, Tooltip, IconButton, Collapse, Button, Paper } from '@material-ui/core';
-import { ExpandMore, ExpandLess, WbSunny, Stop, AccessTime } from '@material-ui/icons';
+import { Slider, Tooltip, IconButton, Collapse, Button, Paper } from '@mui/material';
+import { ExpandMore, ExpandLess, WbSunny, Stop, AccessTime } from '@mui/icons-material';
 import { DateTime } from 'luxon';
 
 interface SunlightSliderProps {
@@ -120,7 +120,7 @@ const SunlightSlider: React.FC<SunlightSliderProps> = ({ sunlightTime, onSliderC
                     </Button>
                     <Button
                         variant="contained"
-                        color="default"
+                        color="inherit"
                         startIcon={<AccessTime />}
                         onClick={setToCurrentTime}
                         style={{ marginTop: 8, marginLeft: 8 }}
