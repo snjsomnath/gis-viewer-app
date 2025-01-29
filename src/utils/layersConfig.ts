@@ -125,16 +125,16 @@ const createBuildingLayer = (
     getFillColor: (d: any) => {
       if (d.properties.isFloor) return [0, 0, 0, 0];
       const value = d.properties[colorBy];
-      if (value == null || colorBy === '') return [128, 128, 128, 100]; // Default gray color for missing values
+      if (value == null || colorBy === '') return [255, 255, 255, 255]; // Default gray color for missing values
 
       const isCategorical = typeof value === "string";
       return getColorFromValue(value, colorBy, isCategorical, min, max);
     },
     material: {
-      ambient: 0.2,
-      diffuse: 0.4,
-      shininess: 20,
-      specularColor: [180, 180, 180]
+      ambient: 0.3,
+      diffuse: 0.2,
+      shininess: 10,
+      specularColor: [150, 180, 180]
     },
     _shadows: true,
     pickable: true,

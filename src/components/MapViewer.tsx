@@ -98,28 +98,6 @@ const MapViewer: React.FC = () => {
         setTokenValid(true);
     }, []);
 
-    // FPS Monitoring (Development Mode Only)
-    useEffect(() => {
-        if (process.env.NODE_ENV === 'development') {
-            stats.current = new Stats();
-            stats.current.showPanel(0);
-            Object.assign(stats.current.dom.style, {
-                position: 'fixed',
-                top: '0px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: '100000'
-            });
-            document.body.appendChild(stats.current.dom);
-
-            const animate = () => {
-                stats.current?.begin();
-                stats.current?.end();
-                requestAnimationFrame(animate);
-            };
-            requestAnimationFrame(animate);
-        }
-    }, []);
 
     // Handlers: Memoized to prevent unnecessary re-renders
     const handleSliderChange = useCallback((newValue: number) => {
