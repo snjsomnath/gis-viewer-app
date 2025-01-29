@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Drawer,
   IconButton,
@@ -13,7 +13,9 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import CloseIcon from '@material-ui/icons/Close';
-import Chart from 'chart.js';
+import AreaChart from './charts/AreaChart';
+import HeightChart from './charts/HeightChart';
+import FunctionChart from './charts/FunctionChart';
 import './RightDrawer.css'; // Import the CSS file
 
 interface RightDrawerProps {
@@ -49,93 +51,6 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ geojsonData }) => {
   };
 
   const summaryStats = getSummaryStatistics(geojsonData);
-
-  useEffect(() => {
-    const areaCtx = document.getElementById('areaChart') as HTMLCanvasElement;
-    const heightCtx = document.getElementById('heightChart') as HTMLCanvasElement;
-    const functionCtx = document.getElementById('functionChart') as HTMLCanvasElement;
-
-    if (areaCtx) {
-      new Chart(areaCtx, {
-        type: 'bar',
-        data: {
-          labels: summaryStats.areaDistribution.map((_: number, index: number) => `Building ${index + 1}`),
-          datasets: [
-            {
-              label: 'Area (m²)',
-              data: summaryStats.areaDistribution,
-              backgroundColor: '#ff9800',
-            },
-          ],
-        },
-        options: {
-          scales: {
-            yAxes: [
-              {
-                ticks: {
-                  beginAtZero: true,
-                },
-              },
-            ],
-          },
-        },
-      });
-    }
-
-    if (heightCtx) {
-      new Chart(heightCtx, {
-        type: 'bar',
-        data: {
-          labels: summaryStats.heightDistribution.map((_: number, index: number) => `Building ${index + 1}`),
-          datasets: [
-            {
-              label: 'Height (m)',
-              data: summaryStats.heightDistribution,
-              backgroundColor: '#2196f3',
-            },
-          ],
-        },
-        options: {
-          scales: {
-            yAxes: [
-              {
-                ticks: {
-                  beginAtZero: true,
-                },
-              },
-            ],
-          },
-        },
-      });
-    }
-
-    if (functionCtx) {
-      new Chart(functionCtx, {
-        type: 'bar',
-        data: {
-          labels: Object.keys(summaryStats.functionDistribution),
-          datasets: [
-            {
-              label: 'Function Distribution',
-              data: Object.values(summaryStats.functionDistribution) as number[], // Ensure data is an array of numbers
-              backgroundColor: ['#4caf50', '#ff9800', '#2196f3', '#f44336', '#9c27b0'],
-            },
-          ],
-        },
-        options: {
-          plugins: {
-            tooltip: {
-              enabled: true,
-            },
-          },
-          scales: {
-            xAxes: [{ stacked: true }],
-            yAxes: [{ stacked: true }],
-          },
-        },
-      });
-    }
-  }, [summaryStats]);
 
   return (
     <div>
@@ -174,7 +89,7 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ geojsonData }) => {
             </AccordionSummary>
             <AccordionDetails>
               <div className="chart-container">
-                <canvas id="areaChart"></canvas>
+                <AreaChart data={summaryStats.areaDistribution} />
               </div>
             </AccordionDetails>
           </Accordion>
@@ -184,7 +99,7 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ geojsonData }) => {
             </AccordionSummary>
             <AccordionDetails>
               <div className="chart-container">
-                <canvas id="heightChart"></canvas>
+                <HeightChart data={summaryStats.heightDistribution} />
               </div>
             </AccordionDetails>
           </Accordion>
@@ -194,7 +109,7 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ geojsonData }) => {
             </AccordionSummary>
             <AccordionDetails>
               <div className="chart-container">
-                <canvas id="functionChart"></canvas>
+                <FunctionChart data={summaryStats.functionDistribution} />
               </div>
             </AccordionDetails>
           </Accordion>
