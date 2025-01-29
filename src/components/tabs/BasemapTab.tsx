@@ -1,12 +1,35 @@
 import React, { useState } from 'react';
-import { Box, Typography, Select, MenuItem, SelectChangeEvent } from '@mui/material';
-import { tabContainerStyle } from './TabStyles';
+import { Box, Typography, Select, MenuItem, makeStyles } from '@material-ui/core';
+
+const useStyles = makeStyles((theme) => ({
+    container: {
+        padding: theme.spacing(2),
+        backgroundColor: '#F5F5F5',
+        borderRadius: 8,
+    },
+    title: {
+        color: '#1E1E2D',
+        marginBottom: theme.spacing(2),
+    },
+    select: {
+        width: '100%',
+        backgroundColor: '#FFFFFF',
+        '& .MuiSelect-root': {
+            padding: theme.spacing(1),
+        },
+    },
+    menuPaper: {
+        maxHeight: 200, // Fix dropdown height
+        overflowY: 'auto',
+    },
+}));
 
 interface BasemapTabProps {
     onBasemapChange: (basemapStyle: string) => void;
 }
 
 const BasemapTab: React.FC<BasemapTabProps> = ({ onBasemapChange }) => {
+    const classes = useStyles();
     const [selectedBasemap, setSelectedBasemap] = useState('mapbox://styles/mapbox/light-v10');
 
     const basemaps = [
@@ -17,35 +40,25 @@ const BasemapTab: React.FC<BasemapTabProps> = ({ onBasemapChange }) => {
         { id: 'mapbox://styles/mapbox/dark-v10', name: 'Dark' },
     ];
 
-    const handleBasemapChange = (event: SelectChangeEvent<string>) => {
-        const newBasemap = event.target.value;
+    const handleBasemapChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        const newBasemap = event.target.value as string;
         setSelectedBasemap(newBasemap);
         onBasemapChange(newBasemap);
     };
 
     return (
-        <Box sx={tabContainerStyle}>
-            <Typography variant="h5" gutterBottom sx={{ color: '#1E1E2D' }}>
+        <Box className={classes.container}>
+            <Typography variant="h5" className={classes.title}>
                 Basemap Selection
             </Typography>
             <Select
                 fullWidth
                 value={selectedBasemap}
                 onChange={handleBasemapChange}
+                variant="outlined"
+                className={classes.select}
                 MenuProps={{
-                    PaperProps: {
-                        style: {
-                            maxHeight: 200, // Adjust height
-                            overflow: 'auto',
-                        },
-                    },
-                }}
-                sx={{
-                    backgroundColor: '#FFFFFF',
-                    color: '#1E1E2D',
-                    '.MuiMenuItem-root': {
-                        display: 'block', // Ensure block display for items
-                    },
+                    PaperProps: { className: classes.menuPaper },
                 }}
             >
                 {basemaps.map((basemap) => (

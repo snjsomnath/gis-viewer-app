@@ -1,24 +1,14 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import { Map, NavigationControl, GeolocateControl } from 'react-map-gl';
-//import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import 'mapbox-gl/dist/mapbox-gl.css';
-//import '@mapbox/mapbox-gl-geocoder/dist/mapbox-geocoder.css';
 import DeckGL from '@deck.gl/react';
-import { createLayers, createTreeLayer } from '../utils/layersConfig';
+import { createLayers } from '../utils/layersConfig';
 import { lightingEffect, dirLight } from '../utils/lightingEffects';
 import './PopupComponent.css';
 import SunlightSlider from './SunlightSlider';
 import Stats from 'stats.js';
 
 const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN as string;
-
-const INITIAL_VIEW_STATE = {
-    longitude: 11.964164014667688,
-    latitude: 57.707441012101015,
-    zoom: 16,
-    pitch: 45,
-    bearing: 0,
-};
 
 interface MapComponentProps {
     initialViewState: {
@@ -34,8 +24,8 @@ interface MapComponentProps {
     gisData: any;
     treeData: any;
     layerVisibility: { [key: string]: boolean };
-    showBasemap: boolean; // Add showBasemap prop
-    treePointsData: any; // Add treePointsData prop
+    showBasemap: boolean;
+    treePointsData: any;
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ 
@@ -46,39 +36,32 @@ const MapComponent: React.FC<MapComponentProps> = ({
     gisData,
     treeData,
     layerVisibility,
-    showBasemap, // Add showBasemap prop
-    treePointsData // Add treePointsData prop
+    showBasemap,
+    treePointsData
 }) => {
     const mapRef = useRef<any>(null);
-    const [effects] = useState(() => [lightingEffect]);
     const stats = useRef<Stats | null>(null);
 
-    // useEffect(() => {
-    //     if (mapRef.current && !mapRef.current.getMap().geocoderAdded) {
-    //         const geocoder = new MapboxGeocoder({
-    //             accessToken: mapboxAccessToken,
-    //             mapboxgl: mapRef.current.getMap(),
-    //         });
+    // Memoize lighting effects to prevent re-rendering
+    const effects = useMemo(() => [lightingEffect], []);
 
-    //         mapRef.current.getMap().addControl(geocoder, 'top-right');
-    //         mapRef.current.getMap().geocoderAdded = true;
-    //     }
-    // }, [mapboxAccessToken]);
-
+    // Update light effect when sunlightTime changes
     useEffect(() => {
         dirLight.timestamp = sunlightTime;
     }, [sunlightTime]);
 
+    // Set up FPS monitoring in development mode
     useEffect(() => {
         if (process.env.NODE_ENV === 'development') {
             stats.current = new Stats();
-            stats.current.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+            stats.current.showPanel(0);
             stats.current.dom.style.position = 'fixed';
             stats.current.dom.style.top = '0px';
             stats.current.dom.style.left = '50%';
             stats.current.dom.style.transform = 'translateX(-50%)';
             stats.current.dom.style.zIndex = '100000';
             document.body.appendChild(stats.current.dom);
+
             const animate = () => {
                 stats.current?.begin();
                 stats.current?.end();
@@ -88,41 +71,41 @@ const MapComponent: React.FC<MapComponentProps> = ({
         }
     }, []);
 
-    const handleLayerClick = (info: any) => {
-        // Handle layer click if needed
-    };
+    // Handle layer clicks
+    const handleLayerClick = useCallback((info: any) => {
+        // Custom click handler logic
+    }, []);
 
-    const predefinedAttributes = [
-        'name', 'type', 'status', 'height', 'function', 'floors', 'floor_height', 'roof_type', 'EPC_class', 'annual_energy', 'area'
-    ];
+    // Memoize layers to prevent re-creating them on every render
+    const layers = useMemo(() => {
+        if (!gisData) return [];
+        return createLayers(gisData, treeData, handleLayerClick, sunlightTime, 'function')
+            .filter(layer => layerVisibility[layer.id]);
+    }, [gisData, treeData, sunlightTime, layerVisibility, handleLayerClick]);
 
-    const getTooltip = (info: { object?: any }) => {
-        const { object } = info;
-        if (!object) return null;
-        const properties = object.properties || {};
-        const tooltipContent = predefinedAttributes.map(attr => {
-            return `${attr}: ${properties[attr] !== undefined ? properties[attr] : 'Not available'}`;
-        }).join('\n');
-        return { text: tooltipContent };
-    };
-
-    // Set the colorBy layer to 'xx' for the buildings
-    const colorBy = 'function';
-
-    const layers = gisData ? createLayers(gisData, treeData, handleLayerClick, sunlightTime, colorBy).filter(layer => 
-        layerVisibility[layer.id]
-    ) : [];
-
-    //console.log('Layers passed to DeckGL:', layers); // Add log
+    // Memoize tooltip function to prevent re-renders
+    const getTooltip = useCallback((info: { object?: any }) => {
+        if (!info.object) return null;
+        const properties = info.object.properties || {};
+        return {
+            text: [
+                `Name: ${properties.name || 'N/A'}`,
+                `Type: ${properties.type || 'N/A'}`,
+                `Height: ${properties.height || 'N/A'} m`,
+                `Function: ${properties.function || 'N/A'}`,
+                `Floors: ${properties.floors || 'N/A'}`,
+            ].join('\n')
+        };
+    }, []);
 
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
             <DeckGL
                 initialViewState={initialViewState}
                 controller={true}
-                layers={layers}
-                effects={effects}
-                getTooltip={getTooltip}
+                layers={layers} // ✅ Now memoized
+                effects={effects} // ✅ Now memoized
+                getTooltip={getTooltip} // ✅ Now memoized
                 useDevicePixels={true}
             >
                 {showBasemap && (
@@ -134,10 +117,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                     />
                 )}
             </DeckGL>
-            <SunlightSlider
-                sunlightTime={sunlightTime}
-                onSliderChange={() => {}}
-            />
+            <SunlightSlider sunlightTime={sunlightTime} onSliderChange={() => {}} />
         </div>
     );
 };
