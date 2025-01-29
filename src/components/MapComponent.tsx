@@ -80,7 +80,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     const layers = useMemo(() => {
         if (!gisData) return [];
         return createLayers(gisData, treeData, handleLayerClick, sunlightTime, 'function')
-            .filter(layer => layerVisibility[layer.id]);
+            .filter(layer => layer && layerVisibility[layer.id]); // Add null check for layer
     }, [gisData, treeData, sunlightTime, layerVisibility, handleLayerClick]);
 
     // Memoize tooltip function to prevent re-renders

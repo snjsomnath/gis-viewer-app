@@ -44,42 +44,33 @@ const generateBoundingBox = (data: any): Feature<Polygon> => {
 };
 
 const createTreeLayer = (data: any, id: string = 'tree-layer') => {
-    console.log('Creating Tree Layer with data:', data);
-    const layer = new ScenegraphLayer({
-        id,
-        data,
-        scenegraph: '/tree.glb',
-        getPosition: (d: any) => {
-            console.log('Tree position:', d.geometry.coordinates);
-            return d.geometry.coordinates;
-        },
-        getOrientation: (d: any) => [0, Math.random() * 180, 90],
-        sizeScale: 5, // Scale multiplier
-        pickable: true,
-        _lighting: 'flat',
-        onError: (error: any) => {
-            console.error('Error loading ScenegraphLayer:', error);
-        }
-    });
-    return layer;
-};
+  console.log('Creating Tree Layer with data:', data);
 
-// const createTreeLayer = (data: any, id: string = 'tree-layer') => {
-//   const layer = new ScenegraphLayer({
-//     id,
-//     data,
-//     getPosition: (d: any) => d.geometry.coordinates,
-//     getOrientation: (d: any) => [0, Math.random() * 180, 90],
-//     scenegraph: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxAnimated/glTF-Binary/BoxAnimated.glb',
-//     sizeScale: 500,
-//     _animations: {
-//       '*': {speed: 5}
-//     },
-//     _lighting: 'pbr',
-//     pickable: true
-//   });
-// return layer;
-// };
+  if (!data || !Array.isArray(data.features)) {
+      console.error('Tree layer data is missing or not an array:', data);
+      return null; // Prevents layer creation if data is invalid
+  }
+
+  const layer = new ScenegraphLayer({
+      id,
+      data: data.features, // Ensure it's passing an array of features
+      scenegraph: 'tree.glb',
+      getPosition: (d: any) => {
+          console.log('Tree position:', d.geometry?.coordinates); // Log tree position
+          return d.geometry?.coordinates || [0, 0, 0]; // Ensure valid default value
+      },
+      getOrientation: (d: any) => [0, Math.random() * 180, 90],
+      sizeScale: 1, // Scale multiplier
+      pickable: true,
+      _lighting: 'pbr',
+      onError: (error: any) => {
+          console.error('Error loading ScenegraphLayer:', error);
+      }
+  });
+
+  console.log('Tree Layer created:', layer);
+  return layer;
+};
 
 const createTreePointsLayer = (data: any, id: string = 'tree-points-layer') => {
     return new GeoJsonLayer({
