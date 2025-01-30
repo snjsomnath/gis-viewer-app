@@ -9,6 +9,7 @@ import { load } from '@loaders.gl/core';
 import { SimpleMeshLayer } from '@deck.gl/mesh-layers';
 import { registerLoaders } from '@loaders.gl/core';
 import { CubeGeometry } from '@luma.gl/engine';
+import { hbjsonToGLB } from './hbjsonHelpers';
 
 // Register the GLTF loader
 registerLoaders([GLTFLoader]);
@@ -156,7 +157,7 @@ const createLandCoverLayer = (gisData: any) => {
   });
 };
 
-export const createLayers = (gisData: any, treeData: any, handleLayerClick: (info: any) => void, sunlightTime: number, colorBy: string) => {
+export const createLayers = async (gisData: any, treeData: any, handleLayerClick: (info: any) => void, sunlightTime: number, colorBy: string) => {
   console.log('Creating layers with colorBy:', colorBy); // Add this line
   const date = DateTime.fromMillis(sunlightTime).setZone('Europe/Stockholm');
   const sunrise = date.startOf('day').plus({ hours: 6 });
@@ -168,10 +169,43 @@ export const createLayers = (gisData: any, treeData: any, handleLayerClick: (inf
     createLandCoverLayer(gisData),
     createTreePointsLayer(treeData),
     createTreeLayer(treeData),
+    await createHBJSONLayer([57.70914026519199, 11.968368995602521]), // Add this line
   ];
 
   console.log('Layers created:', layers); // Add this line
   return layers;
+};
+
+/**
+ * Adds an HBJSON-based GLB layer to the map.
+ * @param position - [latitude, longitude] coordinates for placement.
+ * @returns A ScenegraphLayer for Deck.gl.
+ */
+export const createHBJSONLayer = async (position: [number, number]) => {
+    try {
+        const response = await fetch('https://raw.githubusercontent.com/ladybug-tools/honeybee-schema/refs/heads/master/samples/model_large/lab_building.hbjson');
+        const demoHbjson = await response.json();
+        const filePath = await hbjsonToGLB(demoHbjson);
+
+        return new ScenegraphLayer({
+            id: 'hbjson-glb-layer',
+            data: [{ position }],
+            scenegraph: filePath,
+            getPosition: (d: any) => d.position,
+            getOrientation: () => [0, 0, 0],
+            getScale: [1, 1, 1],
+            sizeScale: 1,
+            pickable: true,
+            getColor: [255, 255, 255, 255],
+            _lighting: 'pbr',
+            onError: (error: any) => {
+                console.error('Error loading HBJSON GLB layer:', error);
+            }
+        });
+    } catch (error) {
+        console.error('Failed to load HBJSON:', error);
+        return null;
+    }
 };
 
 export { createTreeLayer, createTreePointsLayer };

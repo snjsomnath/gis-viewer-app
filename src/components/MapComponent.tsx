@@ -84,15 +84,19 @@ const MapComponent: React.FC<MapComponentProps> = ({
         if (!gisData) return;
 
         const updateLayers = async () => {
-            console.log('Updating layers with colorBy:', colorBy); // Add this line
-            const layerPromises = createLayers(gisData, treeData, handleLayerClick, sunlightTime, colorBy); // Pass colorBy
-            const resolvedLayers = await Promise.all(layerPromises);
-            console.log('Resolved layers:', resolvedLayers); // Add this line
-            setLayers(resolvedLayers.filter(layer => layer && layerVisibility[layer.id])); // Added null check for layer
+            console.log('Updating layers with colorBy:', colorBy);
+
+            // ✅ Ensure we correctly await the promise
+            const resolvedLayers: any[] = await createLayers(gisData, treeData, handleLayerClick, sunlightTime, colorBy);
+            
+            console.log('Resolved layers:', resolvedLayers);
+
+            // ✅ Explicitly cast `layer` as `any`
+            setLayers(resolvedLayers.filter(layer => layer && layerVisibility[(layer as any).id]));
         };
 
         updateLayers();
-    }, [gisData, treeData, sunlightTime, layerVisibility, handleLayerClick, colorBy]); // Add colorBy to dependencies
+    }, [gisData, treeData, sunlightTime, layerVisibility, handleLayerClick, colorBy]);
 
     // Memoize tooltip function to prevent re-renders
     const getTooltip = useCallback((info: { object?: any }) => {
