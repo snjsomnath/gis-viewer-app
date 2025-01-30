@@ -52,7 +52,7 @@ const createTreeLayer = async (data: any, id: string = 'tree-layer') => {
       return null; // Prevents layer creation if data is invalid
   }
 
-  const scenegraph = 'tree.glb';
+  const scenegraph = 'tree.glb'; // Ensure the correct path
 
   const layer = new ScenegraphLayer({
       id,
@@ -108,9 +108,9 @@ const createBuildingLayer = (
   gisData: any,
   handleLayerClick: (info: any) => void,
   timeOfDay: string,
-  colorBy: string // Ensure colorBy is received
+  colorBy: string
 ) => {
-  console.log('Creating Building Layer with colorBy:', colorBy); // Add this line
+  console.log('Creating Building Layer with colorBy:', colorBy);
 
   // Compute min and max for numerical attributes
   const min = Math.min(...gisData.features.map((f: any) => f.properties[colorBy] || 0));
@@ -141,7 +141,8 @@ const createBuildingLayer = (
     pickable: true,
     onClick: handleLayerClick,
     updateTriggers: {
-      getFillColor: colorBy // Add this line
+      getFillColor: colorBy,
+      getElevation: 'height' // Ensure elevation updates correctly
     }
   });
 };
@@ -157,56 +158,146 @@ const createLandCoverLayer = (gisData: any) => {
   });
 };
 
-export const createLayers = async (gisData: any, treeData: any, handleLayerClick: (info: any) => void, sunlightTime: number, colorBy: string) => {
-  console.log('Creating layers with colorBy:', colorBy); // Add this line
-  const date = DateTime.fromMillis(sunlightTime).setZone('Europe/Stockholm');
-  const sunrise = date.startOf('day').plus({ hours: 6 });
-  const sunset = date.startOf('day').plus({ hours: 18 });
-  const timeOfDay = date > sunrise && date < sunset ? "day" : "night";
-
-  const layers = [
-    createBuildingLayer(gisData, handleLayerClick, timeOfDay, colorBy),
-    createLandCoverLayer(gisData),
-    createTreePointsLayer(treeData),
-    createTreeLayer(treeData),
-    await createHBJSONLayer([57.70914026519199, 11.968368995602521]), // Add this line
-  ];
-
-  console.log('Layers created:', layers); // Add this line
-  return layers;
-};
-
 /**
  * Adds an HBJSON-based GLB layer to the map.
  * @param position - [latitude, longitude] coordinates for placement.
  * @returns A ScenegraphLayer for Deck.gl.
  */
-export const createHBJSONLayer = async (position: [number, number]) => {
-    try {
-        const response = await fetch('https://raw.githubusercontent.com/ladybug-tools/honeybee-schema/refs/heads/master/samples/model_large/lab_building.hbjson');
-        const demoHbjson = await response.json();
-        const filePath = await hbjsonToGLB(demoHbjson);
+  const createHBJSONLayer = async (position: [number, number,number]) => {
+  const existingFilePath = 'uploads/demo.glb';
+  const remoteHBJSONUrl = 'https://raw.githubusercontent.com/ladybug-tools/honeybee-schema/refs/heads/master/samples/model_large/lab_building.hbjson';
+  const saveGLBUrl = 'http://localhost:3001/api/save-glb';
 
-        return new ScenegraphLayer({
-            id: 'hbjson-glb-layer',
-            data: [{ position }],
-            scenegraph: filePath,
-            getPosition: (d: any) => d.position,
-            getOrientation: () => [0, 0, 0],
-            getScale: [1, 1, 1],
-            sizeScale: 1,
-            pickable: true,
-            getColor: [255, 255, 255, 255],
-            _lighting: 'pbr',
-            onError: (error: any) => {
-                console.error('Error loading HBJSON GLB layer:', error);
-            }
-        });
-    } catch (error) {
-        console.error('Failed to load HBJSON:', error);
-        return null;
-    }
+  try {
+      // Check if the GLB file already exists on the server
+      const fileExistsResponse = await fetch(existingFilePath, { method: 'HEAD' });
+
+      if (fileExistsResponse.ok) {
+          console.log('GLB file found on the server.');
+          return generateScenegraphLayer(position, existingFilePath);
+      }
+
+      console.log('GLB file not found. Fetching and converting HBJSON...');
+
+      // Fetch and convert HBJSON to GLB
+      const glbBuffer = await fetchAndConvertHBJSON(remoteHBJSONUrl);
+      if (!glbBuffer) throw new Error('Failed to convert HBJSON to GLB');
+
+      // Save GLB to the server
+      const savedFilePath = await saveGLBToServer(glbBuffer, saveGLBUrl);
+      if (!savedFilePath) throw new Error('Failed to save GLB on the server');
+
+      console.log('GLB file saved. Creating ScenegraphLayer...');
+      return generateScenegraphLayer(position, savedFilePath);
+
+  } catch (error) {
+      console.error('Failed to create HBJSON layer:', error);
+      return null;
+  }
 };
 
-export { createTreeLayer, createTreePointsLayer };
+/**
+* Fetches an HBJSON file and converts it to a GLB buffer.
+*/
+const fetchAndConvertHBJSON = async (url: string): Promise<ArrayBuffer | null> => {
+  try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch HBJSON');
+
+      const hbjson = await response.json();
+      console.log('HBJSON fetched successfully.');
+
+      return await hbjsonToGLB(hbjson);
+  } catch (error) {
+      console.error('Error fetching or converting HBJSON:', error);
+      return null;
+  }
+};
+
+/**
+* Saves a GLB buffer to the server.
+*/
+const saveGLBToServer = async (glbBuffer: ArrayBuffer, url: string): Promise<string | null> => {
+  try {
+      const saveResponse = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/octet-stream' },
+          body: glbBuffer
+      });
+
+      if (!saveResponse.ok) throw new Error('Failed to save GLB');
+
+      const { filePath } = await saveResponse.json();
+      return filePath;
+  } catch (error) {
+      console.error('Error saving GLB:', error);
+      return null;
+  }
+};
+
+/**
+* Generates a ScenegraphLayer using a specified GLB file.
+*/
+const generateScenegraphLayer = (position: [number, number, number], filePath: string) => {
+  const id = 'hbjson-glb-layer';
+  const data = [{ position }]; // Ensure data follows the expected format
+  const scenegraph = filePath; // can change to filePath after testing
+
+  const layer = new ScenegraphLayer({
+      id,
+      data,
+      scenegraph,
+
+      // Ensure Deck.gl receives [longitude, latitude] format
+      getPosition: (d: any) => d.position || [11.9690435, 57.7068985, 0],
+
+      // Keep orientation fixed
+      getOrientation: () => [0, 0, 0],
+
+      // Keep scale fixed
+      getScale: () => [1, 1, 1],
+
+      sizeScale: 1, // Base scaling factor
+
+      // Enable picking interactions
+      pickable: true,
+
+      // Default color for visibility
+      
+
+      // Use PBR lighting model for better rendering
+      _lighting: 'pbr',
+
+      onError: (error: any) => {
+          console.error('Error loading ScenegraphLayer:', error);
+      }
+  });
+
+  console.log('ScenegraphLayer created:', layer);
+  return layer;
+};
+
+
+export const createLayers = async (gisData: any, treeData: any, handleLayerClick: (info: any) => void, sunlightTime: number, colorBy: string) => {
+  console.log('Creating layers with colorBy:', colorBy);
+  const date = DateTime.fromMillis(sunlightTime).setZone('Europe/Stockholm');
+  const sunrise = date.startOf('day').plus({ hours: 6 });
+  const sunset = date.startOf('day').plus({ hours: 18 });
+  const timeOfDay = date > sunrise && date < sunset ? "day" : "night";
+
+  const hbjsonPosition: [number, number, number] = [11.9690435, 57.7068985, 0]; // [lon, lat, alt]
+  const layers = [
+    await createBuildingLayer(gisData, handleLayerClick, timeOfDay, colorBy),
+    await createLandCoverLayer(gisData),
+    await createTreePointsLayer(treeData),
+    await createTreeLayer(treeData), // Ensure the tree layer is awaited
+    await createHBJSONLayer(hbjsonPosition),
+  ].filter(layer => layer !== null); // Remove any null layers
+
+  console.log('Layers created:', layers);
+  return layers;
+};
+
+
+export { createTreeLayer, createTreePointsLayer, createBuildingLayer, createLandCoverLayer, createHBJSONLayer };
 

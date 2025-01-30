@@ -145,4 +145,3 @@ const LayerSettings: React.FC<LayerSettingsProps> = ({ layers, onToggleLayer, on
 };
 
 export default LayerSettings;
-export {}

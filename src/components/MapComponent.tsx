@@ -85,13 +85,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
         const updateLayers = async () => {
             console.log('Updating layers with colorBy:', colorBy);
-
-            // ✅ Ensure we correctly await the promise
             const resolvedLayers: any[] = await createLayers(gisData, treeData, handleLayerClick, sunlightTime, colorBy);
-            
             console.log('Resolved layers:', resolvedLayers);
-
-            // ✅ Explicitly cast `layer` as `any`
             setLayers(resolvedLayers.filter(layer => layer && layerVisibility[(layer as any).id]));
         };
 
