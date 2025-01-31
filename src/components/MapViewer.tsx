@@ -32,7 +32,7 @@ interface LayerWithVisibility extends Layer {
 const INITIAL_VIEW_STATE: ViewState = {
     longitude: 11.9690435, 
     latitude: 57.7068985,
-    zoom: 19,
+    zoom: 17,
     pitch: 45,
     bearing: 0,
     maxZoom: 20,
@@ -62,7 +62,7 @@ const MapViewer: React.FC = () => {
         'land-cover': true,
         'tree-layer': true,
         'tree-points-layer': true,
-        'hbjson-layer': true
+        'hbjson-glb-layer': true
     }));
 
     // Load GIS Data once

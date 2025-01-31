@@ -164,7 +164,8 @@ const createLandCoverLayer = (gisData: any) => {
  * @returns A ScenegraphLayer for Deck.gl.
  */
   const createHBJSONLayer = async (position: [number, number,number]) => {
-  const existingFilePath = 'uploads/demo.glb';
+    console.log('Creating HBJSON Layer with position:', position);
+  const existingFilePath = 'uploads/demo.glb'; // change to uploads/demo.glb after testing
   const remoteHBJSONUrl = 'https://raw.githubusercontent.com/ladybug-tools/honeybee-schema/refs/heads/master/samples/model_large/lab_building.hbjson';
   const saveGLBUrl = 'http://localhost:3001/api/save-glb';
 
@@ -174,7 +175,7 @@ const createLandCoverLayer = (gisData: any) => {
 
       if (fileExistsResponse.ok) {
           console.log('GLB file found on the server.');
-          return generateScenegraphLayer(position, existingFilePath);
+          return generateHBJSONScenegraphLayer(position, existingFilePath);
       }
 
       console.log('GLB file not found. Fetching and converting HBJSON...');
@@ -187,8 +188,8 @@ const createLandCoverLayer = (gisData: any) => {
       const savedFilePath = await saveGLBToServer(glbBuffer, saveGLBUrl);
       if (!savedFilePath) throw new Error('Failed to save GLB on the server');
 
-      console.log('GLB file saved. Creating ScenegraphLayer...');
-      return generateScenegraphLayer(position, savedFilePath);
+      console.log('GLB file saved. Creating HBJSON ScenegraphLayer...');
+      return generateHBJSONScenegraphLayer(position, savedFilePath);
 
   } catch (error) {
       console.error('Failed to create HBJSON layer:', error);
@@ -238,10 +239,11 @@ const saveGLBToServer = async (glbBuffer: ArrayBuffer, url: string): Promise<str
 /**
 * Generates a ScenegraphLayer using a specified GLB file.
 */
-const generateScenegraphLayer = (position: [number, number, number], filePath: string) => {
-  const id = 'hbjson-glb-layer';
-  const data = [{ position }]; // Ensure data follows the expected format
-  const scenegraph = filePath; // can change to filePath after testing
+const generateHBJSONScenegraphLayer = async (position: [number, number, number], filePath: string) => {
+
+  const id: string = 'hbjson-glb-layer';
+  const data: any = [{ position }]; // Ensure data follows the expected format
+  const scenegraph : string = filePath; // can change to filePath after testing
 
   const layer = new ScenegraphLayer({
       id,
@@ -252,28 +254,28 @@ const generateScenegraphLayer = (position: [number, number, number], filePath: s
       getPosition: (d: any) => d.position || [11.9690435, 57.7068985, 0],
 
       // Keep orientation fixed
-      getOrientation: () => [0, 0, 0],
+      getOrientation: (d: any) => [0, 0, 0],
 
       // Keep scale fixed
-      getScale: () => [1, 1, 1],
+      getScale: (d: any) => [1, 1, 1],
 
-      sizeScale: 1, // Base scaling factor
+      sizeScale: 10, // Base scaling factor
 
       // Enable picking interactions
       pickable: true,
 
       // Default color for visibility
+      getColor: [255, 255, 255, 255],
       
-
       // Use PBR lighting model for better rendering
       _lighting: 'pbr',
 
       onError: (error: any) => {
-          console.error('Error loading ScenegraphLayer:', error);
+          console.error('Error loading HBJSON:', error);
       }
   });
 
-  console.log('ScenegraphLayer created:', layer);
+  console.log('HBJSON Layer created:', layer);
   return layer;
 };
 
