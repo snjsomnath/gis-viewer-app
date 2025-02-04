@@ -16,7 +16,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import AreaChart from './charts/AreaChart';
 import HeightChart from './charts/HeightChart';
 import FunctionChart from './charts/FunctionChart';
-import './RightDrawer.css'; // Import the CSS file
 
 interface RightDrawerProps {
   geojsonData: any;
@@ -52,11 +51,21 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ geojsonData }) => {
 
   const summaryStats = getSummaryStatistics(geojsonData);
 
+  //const boxStyle = { display: 'flex' } as const;
+
   return (
     <div>
       <IconButton
-        className={`chevron ${open ? 'chevron-open' : ''}`}
         onClick={toggleDrawer}
+        sx={{
+          backgroundColor: 'var(--chevron-bg)',
+          '&:hover': { backgroundColor: 'var(--chevron-hover-bg)' },
+          position: 'fixed',
+          top: '50%',
+          right: open ? '350px' : '10px', // Ensure right property is set correctly
+          transform: 'translateY(-50%)',
+          zIndex: 1500,
+        }}
       >
         {open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
       </IconButton>
@@ -64,17 +73,34 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ geojsonData }) => {
         anchor="right"
         open={open}
         onClose={toggleDrawer}
-        classes={{ paper: 'drawer-paper' }}
         variant="persistent"
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: 350,
+            boxSizing: 'border-box',
+            backgroundColor: 'var(--drawer-bg)',
+            color: 'var(--drawer-text)',
+            padding: 2,
+          },
+        }}
       >
-        <div className="drawer-header">
-          <Typography variant="h6">Summary Statistics</Typography>
-          <IconButton onClick={toggleDrawer}>
+        <Box
+          component="div"
+          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1 }}
+        >
+          <Typography variant="h6" sx={{ color: 'var(--drawer-text)' }}>
+            Summary Statistics
+          </Typography>
+          <IconButton onClick={toggleDrawer} sx={{ color: 'var(--drawer-text)' }}>
             <CloseIcon />
           </IconButton>
-        </div>
-        <Divider />
-        <Box className="content">
+        </Box>
+        <Divider sx={{ backgroundColor: 'var(--drawer-text)' }} />
+        <Box
+          component="div"
+          sx={{ display: 'flex', flexDirection: 'column' }} // Ensure contents stack vertically
+          className="content"
+        >
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography>Total Buildings</Typography>

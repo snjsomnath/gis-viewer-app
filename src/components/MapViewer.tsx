@@ -1,36 +1,36 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import DeckGL, { DeckGLRef } from '@deck.gl/react';
-import { MapView, ViewStateChangeParameters } from '@deck.gl/core';
-import EnergyDataDrawer from './EnergyDataDrawer';
+import React, { useState, useEffect, useCallback } from 'react';
+import DeckGL from '@deck.gl/react';
+import { MapView, Layer, ViewStateChangeParameters } from '@deck.gl/core'; // Add ViewStateChangeParameters import
+import LeftDrawer from './LeftDrawer';
 import MapComponent from './MapComponent';
 import SunlightSlider from './SunlightSlider';
 import { loadGisData, loadTreeData } from '../utils/gisDataLoader';
 import mapboxgl from 'mapbox-gl';
 import { MapboxAccessToken } from '../config/mapbox';
 import RightDrawer from './RightDrawer';
-import Stats from 'stats.js';
-import { Layer } from '@deck.gl/core';
+import { Map as MapIcon } from '@mui/icons-material'; // Add icon import
 
 // Define ViewState interface
 interface ViewState {
     longitude: number;
     latitude: number;
     zoom: number;
-    pitch: number;
-    bearing: number;
+    pitch?: number;
+    bearing?: number;
     maxZoom?: number;
     minZoom?: number;
     maxPitch?: number;
     minPitch?: number;
 }
 
-interface LayerWithVisibility extends Layer {
-    visible: boolean;
+interface LayerWithVisibility extends Layer<any> {
+    isVisible: boolean;
+    visible: boolean; // Add this to match LayerManagementTab's requirements
 }
 
 // Initial Map State
 const INITIAL_VIEW_STATE: ViewState = {
-    longitude: 11.9690435, 
+    longitude: 11.9690435,
     latitude: 57.7068985,
     zoom: 17,
     pitch: 45,
@@ -43,18 +43,15 @@ const INITIAL_VIEW_STATE: ViewState = {
 
 const MapViewer: React.FC = () => {
     const [gisData, setGisData] = useState<any>(null);
-    const [tokenValid, setTokenValid] = useState(false);
     const [sunlightTime, setSunlightTime] = useState(Date.UTC(2019, 2, 1, 14));
-    const [viewState, setViewState] = useState<ViewState>(INITIAL_VIEW_STATE);
-    const deckRef = useRef<DeckGLRef>(null);
-    const stats = useRef<Stats | null>(null);
+    const [viewState, setViewState] = useState<{ [viewId: string]: ViewState }>({
+        main: INITIAL_VIEW_STATE
+    });
 
     // Memoize state values to avoid unnecessary renders
     const [basemapStyle, setBasemapStyle] = useState('mapbox://styles/mapbox/light-v10');
     const [treeData, setTreeData] = useState<any>(null);
-    const [treePointsData, setTreePointsData] = useState<any>(null);
     const [showBasemap, setShowBasemap] = useState(true);
-    
     const [colorBy, setColorBy] = useState<string>(''); // Set default value to empty string
 
     const [layerVisibility, setLayerVisibility] = useState<{ [key: string]: boolean }>(() => ({
@@ -82,7 +79,6 @@ const MapViewer: React.FC = () => {
             if (!treeData) {
                 const data = await loadTreeData();
                 setTreeData(data);
-                setTreePointsData(data);
             }
         };
         fetchTreeData();
@@ -96,9 +92,7 @@ const MapViewer: React.FC = () => {
             return;
         }
         mapboxgl.accessToken = token;
-        setTokenValid(true);
     }, []);
-
 
     // Handlers: Memoized to prevent unnecessary re-renders
     const handleSliderChange = useCallback((newValue: number) => {
@@ -106,13 +100,14 @@ const MapViewer: React.FC = () => {
     }, []);
 
     const resetView = useCallback(() => {
-        setViewState(INITIAL_VIEW_STATE);
+        setViewState({ main: INITIAL_VIEW_STATE });
     }, []);
 
-    const onViewStateChange = useCallback((params: ViewStateChangeParameters) => {
-        if (params.viewState) {
-            setViewState(params.viewState);
-        }
+    const onViewStateChange = useCallback(<ViewStateT extends ViewState>({ viewId, viewState }: ViewStateChangeParameters<ViewStateT>) => {
+        setViewState(prevState => ({
+            ...prevState,
+            [viewId]: viewState
+        }));
     }, []);
 
     const handleBasemapChange = useCallback((style: string) => {
@@ -137,23 +132,29 @@ const MapViewer: React.FC = () => {
 
     return (
         <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
-            <EnergyDataDrawer 
-                resetView={resetView} 
-                onBasemapChange={handleBasemapChange} 
-                layers={Object.keys(layerVisibility).map(id => ({ id, visible: layerVisibility[id] } as LayerWithVisibility))} 
-                onVisibilityToggle={handleVisibilityToggle} 
-                onColorByChange={handleColorByChange} // Add this line
+            <LeftDrawer
+                resetView={resetView}
+                onBasemapChange={handleBasemapChange}
+                layers={Object.keys(layerVisibility).map(id => ({
+                    id,
+                    isVisible: layerVisibility[id]
+                } as LayerWithVisibility))}
+                onVisibilityToggle={handleVisibilityToggle}
+                onColorByChange={handleColorByChange}
             />
             <div style={{ flexGrow: 1, position: 'relative' }}>
                 <DeckGL
-                    ref={deckRef}
-                    views={new MapView({ id: 'main', controller: true })}
+                    views={[new MapView({ id: 'main', controller: true })]}
                     viewState={viewState}
                     onViewStateChange={onViewStateChange}
                     style={{ backgroundColor: 'transparent', height: '100%', width: '100%' }}
                 >
-                    <MapComponent 
-                        initialViewState={viewState}
+                    <MapComponent
+                        initialViewState={{
+                            ...viewState.main,
+                            pitch: viewState.main.pitch ?? 0, // Provide default value for pitch
+                            bearing: viewState.main.bearing ?? 0 // Provide default value for bearing
+                        }}
                         mapboxAccessToken={mapboxgl.accessToken || ''}
                         sunlightTime={sunlightTime}
                         basemapStyle={basemapStyle}
@@ -161,12 +162,12 @@ const MapViewer: React.FC = () => {
                         treeData={treeData}
                         layerVisibility={layerVisibility}
                         showBasemap={showBasemap}
-                        treePointsData={treeData}
                         colorBy={colorBy} // Pass colorBy to MapComponent
                     />
                 </DeckGL>
                 <SunlightSlider sunlightTime={sunlightTime} onSliderChange={handleSliderChange} />
-                <button onClick={toggleBasemap} style={{ position: 'absolute', top: 10, right: 10 }}>
+                <button type="button" onClick={toggleBasemap} className="toggle-button basemap-toggle" style={{ position: 'fixed' }}>
+                    <MapIcon />
                     Toggle Basemap
                 </button>
             </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import Chart from 'chart.js';
+import { Chart, CategoryScale, LinearScale, BarElement, BarController, Tooltip, Legend } from 'chart.js';
+Chart.register(CategoryScale, LinearScale, BarElement, BarController, Tooltip, Legend);
 
 interface HeightChartProps {
   data: number[];
@@ -36,13 +37,9 @@ const HeightChart: React.FC<HeightChartProps> = ({ data }) => {
       },
       options: {
         scales: {
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-              },
-            },
-          ],
+          y: {
+            beginAtZero: true
+          }
         },
       },
     });

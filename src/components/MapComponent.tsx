@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useState, useMemo, useCallback } from 'react';
-import { Map, NavigationControl, GeolocateControl } from 'react-map-gl';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import { Map } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import DeckGL from '@deck.gl/react';
 import { createLayers } from '../utils/layersConfig';
@@ -7,8 +7,6 @@ import { lightingEffect, dirLight } from '../utils/lightingEffects';
 import './PopupComponent.css';
 import SunlightSlider from './SunlightSlider';
 import Stats from 'stats.js';
-
-const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN as string;
 
 interface MapComponentProps {
     initialViewState: {
@@ -25,8 +23,7 @@ interface MapComponentProps {
     treeData: any;
     layerVisibility: { [key: string]: boolean };
     showBasemap: boolean;
-    treePointsData: any;
-    colorBy: string; // Add this line
+    colorBy: string;
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ 
@@ -38,14 +35,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
     treeData,
     layerVisibility,
     showBasemap,
-    treePointsData,
-    colorBy // Add this line
+    colorBy
 }) => {
-    const mapRef = useRef<any>(null);
     const stats = useRef<Stats | null>(null);
     const [layers, setLayers] = useState<any[]>([]);
 
-    // Memoize lighting effects to prevent re-rendering
+    // Memoize lighting effects to prevent re-renders
     const effects = useMemo(() => [lightingEffect], []);
 
     // Update light effect when sunlightTime changes
@@ -58,11 +53,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
         if (process.env.NODE_ENV === 'development') {
             stats.current = new Stats();
             stats.current.showPanel(0);
-            stats.current.dom.style.position = 'fixed';
-            stats.current.dom.style.top = '0px';
-            stats.current.dom.style.left = '50%';
-            stats.current.dom.style.transform = 'translateX(-50%)';
-            stats.current.dom.style.zIndex = '100000';
+            Object.assign(stats.current.dom.style, {
+                position: 'fixed',
+                top: '0px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: '100000'
+            });
             document.body.appendChild(stats.current.dom);
 
             const animate = () => {
@@ -75,25 +72,31 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }, []);
 
     // Handle layer clicks
-    const handleLayerClick = useCallback((info: any) => {
-        // Custom click handler logic
+    const handleLayerClick = useCallback((info: { object?: any }) => {
+        if (!info.object) return;
+        console.log("Clicked on:", info.object);
     }, []);
 
-    // Update layers when gisData, treeData, or other dependencies change
+    // Update layers when data or settings change
     useEffect(() => {
-        if (!gisData) return;
+        if (!gisData || !treeData) return;
 
         const updateLayers = async () => {
-            console.log('Updating layers with colorBy:', colorBy);
-            const resolvedLayers: any[] = await createLayers(gisData, treeData, handleLayerClick, sunlightTime, colorBy);
-            console.log('Resolved layers:', resolvedLayers);
-            setLayers(resolvedLayers.filter(layer => layer && layerVisibility[(layer as any).id]));
+            try {
+                console.log('Updating layers with colorBy:', colorBy);
+                const resolvedLayers = await createLayers(gisData, treeData, handleLayerClick, sunlightTime, colorBy);
+                
+                setLayers(resolvedLayers.filter(layer => layer && layerVisibility[(layer as any).id]));
+                console.log('Resolved layers:', resolvedLayers);
+            } catch (error) {
+                console.error("Error updating layers:", error);
+            }
         };
 
         updateLayers();
-    }, [gisData, treeData, sunlightTime, layerVisibility, handleLayerClick, colorBy]);
+    }, [gisData, treeData, sunlightTime, layerVisibility, colorBy]);
 
-    // Memoize tooltip function to prevent re-renders
+    // Memoize tooltip function to prevent unnecessary re-renders
     const getTooltip = useCallback((info: { object?: any }) => {
         if (!info.object) return null;
         const properties = info.object.properties || {};
@@ -113,9 +116,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
             <DeckGL
                 initialViewState={initialViewState}
                 controller={true}
-                layers={layers} // ✅ Now stored in state
-                effects={effects} // ✅ Now memoized
-                getTooltip={getTooltip} // ✅ Now memoized
+                layers={layers}
+                effects={effects}
+                getTooltip={getTooltip}
                 useDevicePixels={true}
             >
                 {showBasemap && (

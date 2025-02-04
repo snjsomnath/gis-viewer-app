@@ -23,15 +23,6 @@ app.head('/uploads/demo.glb', (req, res) => {
     }
 });
 
-app.head('/uploads/tree.glb', (req, res) => {
-    const filePath = path.join(__dirname, 'public', 'uploads', 'tree.glb');
-    if (fs.existsSync(filePath)) {
-        res.status(200).end();
-    } else {
-        res.status(404).end();
-    }
-});
-
 app.post('/api/save-glb', (req, res) => {
     console.log('Received request to save GLB file');
     const filePath = path.join(__dirname, 'public', 'uploads', 'demo.glb'); // Save to a separate directory

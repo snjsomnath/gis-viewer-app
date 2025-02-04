@@ -17,14 +17,14 @@ const SunlightSlider: React.FC<SunlightSliderProps> = ({ sunlightTime, onSliderC
         setExpanded(!expanded);
     };
 
-    const handleDateChange = (event: any, newValue: number | number[]) => {
+    const handleDateChange = (_: any, newValue: number | number[]) => {
         const currentTime = DateTime.fromMillis(sunlightTime).setZone('Europe/Stockholm').diff(DateTime.fromMillis(sunlightTime).setZone('Europe/Stockholm').startOf('day')).toMillis();
         const newDate = DateTime.fromMillis(newValue as number).setZone('Europe/Stockholm').startOf('day').toMillis();
         const combinedDateTime = newDate + currentTime;
         onSliderChange(combinedDateTime);
     };
 
-    const handleTimeChange = (event: any, newValue: number | number[]) => {
+    const handleTimeChange = (_: any, newValue: number | number[]) => {
         const time = DateTime.fromMillis(sunlightTime).setZone('Europe/Stockholm').startOf('day').plus({ milliseconds: newValue as number }).toMillis();
         onSliderChange(time);
     };
@@ -58,24 +58,24 @@ const SunlightSlider: React.FC<SunlightSliderProps> = ({ sunlightTime, onSliderC
     };
 
     return (
-        <div style={{ position: 'absolute', bottom: 20, right: 20, width: 300, zIndex: 1 }}>
-            <Paper style={{ padding: 8, backgroundColor: '#f5f5f5' }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div className="sunlight-slider-container">
+            <Paper className="sunlight-slider-paper">
+                <div className="sunlight-slider-header">
                     <Tooltip title="Sunlight settings">
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                             <WbSunny />
-                            <span style={{ marginLeft: 8 }}>Sunlight Settings</span>
+                            <span>Sunlight Settings</span>
                         </div>
                     </Tooltip>
                     <Tooltip title="Adjust sunlight time">
-                        <IconButton onClick={handleExpandClick} style={{ marginLeft: 'auto' }}>
+                        <IconButton onClick={handleExpandClick} className="sunlight-slider-icon-button">
                             {expanded ? <ExpandLess /> : <ExpandMore />}
                         </IconButton>
                     </Tooltip>
                 </div>
             </Paper>
             <Collapse in={expanded}>
-                <Paper style={{ padding: 16, marginTop: 8, backgroundColor: '#e0e0e0' }}>
+                <Paper className="sunlight-slider-collapse-paper">
                     <Tooltip title="Select Date" arrow>
                         <Slider
                             value={DateTime.fromMillis(sunlightTime).setZone('Europe/Stockholm').startOf('day').toMillis()}
@@ -104,7 +104,7 @@ const SunlightSlider: React.FC<SunlightSliderProps> = ({ sunlightTime, onSliderC
                         startIcon={<WbSunny />}
                         onClick={animateSun}
                         disabled={animating}
-                        style={{ marginTop: 8 }}
+                        className="sunlight-slider-button"
                     >
                         Animate Sun
                     </Button>
@@ -114,7 +114,7 @@ const SunlightSlider: React.FC<SunlightSliderProps> = ({ sunlightTime, onSliderC
                         startIcon={<Stop />}
                         onClick={stopAnimation}
                         disabled={!animating}
-                        style={{ marginTop: 8, marginLeft: 8 }}
+                        className="sunlight-slider-button"
                     >
                         Stop Animation
                     </Button>
@@ -123,7 +123,7 @@ const SunlightSlider: React.FC<SunlightSliderProps> = ({ sunlightTime, onSliderC
                         color="inherit"
                         startIcon={<AccessTime />}
                         onClick={setToCurrentTime}
-                        style={{ marginTop: 8, marginLeft: 8 }}
+                        className="sunlight-slider-button"
                     >
                         Now
                     </Button>

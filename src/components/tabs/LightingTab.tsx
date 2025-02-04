@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Typography, Switch, Slider } from '@mui/material';
-import { tabContainerStyle } from './TabStyles';
 
 const LightingTab: React.FC = () => {
     const [sunlight, setSunlight] = React.useState(true);
@@ -13,36 +12,35 @@ const LightingTab: React.FC = () => {
     };
 
     const handleSliderChange = (setter: React.Dispatch<React.SetStateAction<number>>) => (
-        event: Event,
+        _: Event,
         newValue: number | number[]
     ) => {
         setter(newValue as number);
     };
 
     return (
-        <Box sx={tabContainerStyle}>
-            <Typography variant="h5" gutterBottom sx={{ color: '#1E1E2D' }}>
+        <Box className="tab-container" component="div">
+            <Typography variant="h5" gutterBottom className="typography-header">
                 Lighting Setup
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="body1" gutterBottom sx={{ flexGrow: 1, color: '#1E1E2D' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}component="div">
+                <Typography variant="body1" gutterBottom sx={{ flexGrow: 1 }}>
                     Sunlight
                 </Typography>
-                <Switch checked={sunlight} onChange={handleSunlightToggle} sx={{ color: '#FFFFFF' }} />
+                <Switch checked={sunlight} onChange={handleSunlightToggle} />
             </Box>
-            <Typography variant="body1" gutterBottom sx={{ color: '#1E1E2D' }}>
+            <Typography variant="body1" gutterBottom>
                 Sun Color
             </Typography>
-            <Slider value={sunColor} onChange={handleSliderChange(setSunColor)} sx={{ color: '#FFFFFF' }} />
-            <Typography variant="body1" gutterBottom sx={{ color: '#1E1E2D' }}>
+            <Slider value={sunColor} onChange={handleSliderChange(setSunColor)} />
+            <Typography variant="body1" gutterBottom>
                 Diffuse Color
             </Typography>
-            <Slider value={diffuseColor} onChange={handleSliderChange(setDiffuseColor)} sx={{ color: '#FFFFFF' }} />
-            <Typography variant="body1" gutterBottom sx={{ color: '#1E1E2D' }}>
+            <Slider value={diffuseColor} onChange={handleSliderChange(setDiffuseColor)} />
+            <Typography variant="body1" gutterBottom>
                 Shadow Color
             </Typography>
-            <Slider value={shadowColor} onChange={handleSliderChange(setShadowColor)} sx={{ color: '#FFFFFF' }} />
-            {/* Add live preview of lighting changes here */}
+            <Slider value={shadowColor} onChange={handleSliderChange(setShadowColor)} />
         </Box>
     );
 };

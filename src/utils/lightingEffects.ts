@@ -1,5 +1,24 @@
 import { LightingEffect, AmbientLight, _SunLight as SunLight } from '@deck.gl/core';
 
+interface ExtendedLightingEffect extends LightingEffect {
+    shadowColor: [number, number, number, number];
+}
+
+// Extended SunLight type to include all properties we need to access
+interface ExtendedSunLight extends SunLight {
+    timestamp: number;
+    color: [number, number, number];
+    intensity: number;
+}
+
+// Updated type definition with required timestamp
+type SunLightProps = {
+    timestamp: number;  // Made required by removing the optional operator
+    color?: [number, number, number];
+    intensity?: number;
+    _shadow?: boolean;
+};
+
 const ambientLight = new AmbientLight({
     color: [160, 190, 255], // Slightly deeper blue for realistic sky reflection
     intensity: 2.2 // Stronger ambient light presence
@@ -10,9 +29,9 @@ const dirLight = new SunLight({
     color: [255, 215, 130], // Warmer and more saturated yellow sunlight
     intensity: 2.5, // Slightly stronger for a glowing effect
     _shadow: true
-});
+} satisfies SunLightProps) as ExtendedSunLight;
 
-const lightingEffect = new LightingEffect({ ambientLight, dirLight });
+const lightingEffect = new LightingEffect({ ambientLight, dirLight }) as ExtendedLightingEffect;
 lightingEffect.shadowColor = [0, 0, 0, 0.3]; // Softer and slightly lighter shadows
 
 export function generateLighting(date: Date) {

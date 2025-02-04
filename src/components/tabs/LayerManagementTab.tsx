@@ -8,7 +8,6 @@ import {
     VisibilityOff as VisibilityOffIcon, 
     ExpandMore, ExpandLess 
 } from '@mui/icons-material';
-import { tabContainerStyle } from './TabStyles';
 
 interface LayerWithVisibility {
     id: string;
@@ -47,8 +46,8 @@ const LayerManagementTab: React.FC<LayerManagementTabProps> = ({ layers, onVisib
     };
 
     return (
-        <Box sx={tabContainerStyle}>
-            <Typography variant="h5" fontWeight="bold" gutterBottom>
+        <Box className="tab-container">
+            <Typography variant="h5" fontWeight="bold" gutterBottom className="typography-header">
                 Layer Management
             </Typography>
             
@@ -90,7 +89,7 @@ const LayerManagementTab: React.FC<LayerManagementTabProps> = ({ layers, onVisib
                 <Collapse in={buildingsExpanded} timeout="auto" unmountOnExit>
                     <FormControl fullWidth margin="normal" sx={{ mt: 2 }}>
                         <InputLabel sx={{ mb: 1 }}>Color By</InputLabel>
-                        <Select value={colorBy} onChange={handleColorByChange}>
+                        <Select value={colorBy} onChange={handleColorByChange} className="select-box">
                             {eligibleAttributes.map(attr => (
                                 <MenuItem key={attr} value={attr}>{attr}</MenuItem>
                             ))}

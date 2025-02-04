@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useMemo } from 'react';
-import Chart from 'chart.js';
+import { Chart, CategoryScale, LinearScale, BarElement, BarController, Tooltip, Legend } from 'chart.js';
+Chart.register(CategoryScale, LinearScale, BarElement, BarController, Tooltip, Legend);
 
 interface FunctionChartProps {
   data: { [key: string]: number };
@@ -32,8 +33,12 @@ const FunctionChart: React.FC<FunctionChartProps> = ({ data }) => {
       },
       options: {
         scales: {
-          xAxes: [{ stacked: true }], // ✅ Correct for Chart.js 2.x
-          yAxes: [{ stacked: true }]
+          x: { 
+            stacked: true 
+          },
+          y: { 
+            stacked: true 
+          }
         }
       }
       
