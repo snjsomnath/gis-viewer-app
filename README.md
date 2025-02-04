@@ -3,6 +3,8 @@
 ## Overview
 The GIS Viewer Application is a React-based project designed to load, view, and filter GIS files. It provides a user-friendly interface for visualizing geographic data and supports various file formats.
 
+![alt text](image.png)
+
 ## Features
 - Load and display GIS files (e.g., GeoJSON, Shapefiles)
 - Filter data based on user-defined criteria
