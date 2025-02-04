@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import DeckGL, { DeckGLRef } from '@deck.gl/react';
 import { MapView, ViewStateChangeParameters } from '@deck.gl/core';
-import EnergyDataDrawer from './EnergyDataDrawer';
+import LeftDrawer from './LeftDrawer';
 import MapComponent from './MapComponent';
 import SunlightSlider from './SunlightSlider';
 import { loadGisData, loadTreeData } from '../utils/gisDataLoader';
@@ -137,7 +137,7 @@ const MapViewer: React.FC = () => {
 
     return (
         <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
-            <EnergyDataDrawer 
+            <LeftDrawer 
                 resetView={resetView} 
                 onBasemapChange={handleBasemapChange} 
                 layers={Object.keys(layerVisibility).map(id => ({ id, visible: layerVisibility[id] } as LayerWithVisibility))} 
@@ -166,8 +166,12 @@ const MapViewer: React.FC = () => {
                     />
                 </DeckGL>
                 <SunlightSlider sunlightTime={sunlightTime} onSliderChange={handleSliderChange} />
-                <button onClick={toggleBasemap} style={{ position: 'absolute', top: 10, right: 10 }}>
-                    Toggle Basemap
+                <button 
+                    className={`toggle-map-btn ${showBasemap ? 'active' : ''}`}
+                    onClick={toggleBasemap}
+                    title={`${showBasemap ? 'Hide' : 'Show'} basemap`}
+                >
+                    <i className="fas fa-map"></i>
                 </button>
             </div>
             {gisData && <RightDrawer geojsonData={gisData} />}

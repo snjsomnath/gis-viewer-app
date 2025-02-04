@@ -16,7 +16,7 @@ gis-viewer-app
 ├── src
 │   ├── App.tsx                # Main entry point of the application
 │   ├── components             # React components
-│   │   ├── EnergyDataDrawer.tsx
+│   │   ├── LeftDrawer.tsx
 │   │   ├── LayerSettings.tsx
 │   │   ├── MapComponent.tsx
 │   │   ├── MapViewer.tsx

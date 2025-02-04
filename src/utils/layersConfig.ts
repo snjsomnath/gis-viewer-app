@@ -1,4 +1,4 @@
-// filepath: /d:/GitHub/CSD_viewer/gis-viewer-app/src/utils/layersConfig.ts
+// filepath: /d:/GitHub/SBE_viewer/gis-viewer-app/src/utils/layersConfig.ts
 import { GeoJsonLayer } from '@deck.gl/layers';
 import { ScenegraphLayer } from '@deck.gl/mesh-layers';
 import { DateTime } from 'luxon';

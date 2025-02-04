@@ -1,4 +1,4 @@
-// filepath: /d:/GitHub/CSD_viewer/gis-viewer-app/src/mapbox-gl-geocoder.d.ts
+// filepath: /d:/GitHub/SBE_viewer/gis-viewer-app/src/mapbox-gl-geocoder.d.ts
 declare module '@mapbox/mapbox-gl-geocoder' {
     import { IControl } from 'mapbox-gl';
     

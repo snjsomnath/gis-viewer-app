@@ -16,7 +16,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import AreaChart from './charts/AreaChart';
 import HeightChart from './charts/HeightChart';
 import FunctionChart from './charts/FunctionChart';
-import './RightDrawer.css'; // Import the CSS file
+import '../style/style.css'; // Import the CSS file
 
 interface RightDrawerProps {
   geojsonData: any;

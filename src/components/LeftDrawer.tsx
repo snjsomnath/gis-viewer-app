@@ -27,7 +27,7 @@ interface LayerWithVisibility extends DeckLayer {
     visible: boolean;
 }
 
-interface EnergyDataDrawerProps {
+interface LeftDrawerProps {
     resetView: () => void;
     onBasemapChange: (style: string) => void;
     layers: LayerWithVisibility[]; // Use LayerWithVisibility
@@ -35,7 +35,7 @@ interface EnergyDataDrawerProps {
     onColorByChange: (colorBy: string) => void;
 }
 
-const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView, onBasemapChange, layers, onVisibilityToggle, onColorByChange }) => {
+const LeftDrawer: React.FC<LeftDrawerProps> = ({ resetView, onBasemapChange, layers, onVisibilityToggle, onColorByChange }) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [basemapStyle, setBasemapStyle] = useState('mapbox://styles/mapbox/light-v10');
 
@@ -57,7 +57,11 @@ const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView, onBasema
     ];
 
     return (
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{ 
+            display: 'flex',
+            backgroundColor: 'var(--bg-light)',
+            minHeight: '100vh'
+        }}>
             <Drawer
                 variant="permanent"
                 anchor="left"
@@ -67,17 +71,19 @@ const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView, onBasema
                     '& .MuiDrawer-paper': {
                         width: 70,
                         boxSizing: 'border-box',
-                        backgroundColor: '#1E1E2D',
-                        color: '#FFFFFF',
+                        backgroundColor: 'var(--drawer-background)',
+                        color: 'var(--drawer-text)',
                         overflowX: 'hidden',
+                        position: 'relative',
+                        height: '100%'
                     },
                 }}
             >
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', p: 1 }}>
-                    <Typography variant="h6" noWrap sx={{ color: '#FFFFFF', ml: 1 }}>CSD</Typography>
+                    <Typography variant="h6" noWrap sx={{ color: 'var(--drawer-text)', ml: 1 }}>SBE</Typography>
                 </Box>
 
-                <Divider sx={{ backgroundColor: '#444' }} />
+                <Divider sx={{ backgroundColor: 'var(--drawer-divider)' }} />
 
                 <List>
                     {tabs.map((tab, index) => (
@@ -88,7 +94,7 @@ const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView, onBasema
                                 disableGutters
                                 sx={{ justifyContent: 'center' }}
                             >
-                                <ListItemIcon sx={{ color: '#FFFFFF', minWidth: 'auto' }}>
+                                <ListItemIcon sx={{ color: 'var(--drawer-text)', minWidth: 'auto' }}>
                                     {tab.icon}
                                 </ListItemIcon>
                             </ListItemButton>
@@ -96,13 +102,21 @@ const EnergyDataDrawer: React.FC<EnergyDataDrawerProps> = ({ resetView, onBasema
                     ))}
                 </List>
 
-                <Divider sx={{ backgroundColor: '#444' }} />
+                <Divider sx={{ backgroundColor: 'var(--drawer-divider)' }} />
             </Drawer>
-            <Box component="main" sx={{ flexGrow: 1, p: 3, backgroundColor: '#E0E0E0' }}>
+            <Box 
+                component="main" 
+                sx={{ 
+                    flexGrow: 1, 
+                    p: 3, 
+                    backgroundColor: 'var(--bg-light)',
+                    minHeight: '100vh'
+                }}
+            >
                 {tabs[selectedIndex].component}
             </Box>
         </Box>
     );
 };
 
-export default EnergyDataDrawer;
+export default LeftDrawer;

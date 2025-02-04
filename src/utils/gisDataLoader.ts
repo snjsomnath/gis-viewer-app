@@ -1,4 +1,4 @@
-// filepath: /d:/GitHub/CSD_viewer/gis-viewer-app/src/utils/gisDataLoader.ts
+// filepath: /d:/GitHub/SBE_viewer/gis-viewer-app/src/utils/gisDataLoader.ts
 // GIS data located at filepath: ../../public/sample-data.geojson
 export const loadGisData = async () => {
     try {

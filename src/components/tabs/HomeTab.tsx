@@ -10,7 +10,7 @@ const HomeTab: React.FC<HomeTabProps> = ({ resetView }) => {
     return (
         <Box sx={tabContainerStyle}>
             <Typography variant="h5" gutterBottom sx={{ color: '#1E1E2D' }}>
-                Welcome to CSD Viewer
+                Welcome to SBE Viewer
             </Typography>
             <Typography variant="body1" gutterBottom sx={{ color: '#1E1E2D' }}>
                 Use the Import Data tab to upload geoJSON files.

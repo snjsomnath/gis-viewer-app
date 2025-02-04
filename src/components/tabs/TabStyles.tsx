@@ -4,5 +4,5 @@ import { SxProps } from '@mui/material';
 export const tabContainerStyle: SxProps = {
     p: 2,
     width: '25vh', // Set a fixed width
-    backgroundColor: '#E0E0E0',
+    backgroundColor: 'var(--bg-light)',
 };

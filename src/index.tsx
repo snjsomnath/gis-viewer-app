@@ -1,10 +1,10 @@
-// filepath: /d:/GitHub/CSD_viewer/gis-viewer-app/src/index.tsx
+// filepath: /d:/GitHub/SBE_viewer/gis-viewer-app/src/index.tsx
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import './style/style.css';
 import App from './App';
 
-document.title = "GIS Viewer App";
+document.title = "SBE Viewer";
 const link = document.createElement('link');
 link.rel = 'icon';
 link.href = 'favicon.ico';
