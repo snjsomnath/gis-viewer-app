@@ -1,4 +1,4 @@
-# GIS Viewer Application
+# SBE Viewer
 
 ## Overview
 The GIS Viewer Application is a React-based project designed to load, view, and filter GIS files. It provides a user-friendly interface for visualizing geographic data and supports various file formats.
@@ -58,7 +58,7 @@ gis-viewer-app
    ```
 2. Navigate to the project directory:
    ```
-   cd gis-viewer-app
+   cd sbe_viewer
    ```
 3. Install the dependencies:
    ```
@@ -68,7 +68,7 @@ gis-viewer-app
 ## Usage
 To start the application, run:
 ```
-npm start
+npm run start-all
 ```
 This will launch the application in your default web browser.
 
