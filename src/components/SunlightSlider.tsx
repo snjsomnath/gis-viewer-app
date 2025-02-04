@@ -59,25 +59,48 @@ const SunlightSlider: React.FC<SunlightSliderProps> = ({ sunlightTime, onSliderC
 
     return (
         <div style={{ position: 'absolute', bottom: 20, right: 20, width: 300, zIndex: 1 }}>
-            <Paper style={{ padding: 8, backgroundColor: '#f5f5f5' }}>
+            <Paper style={{ 
+                padding: 8, 
+                backgroundColor: 'var(--bg-light-secondary)',
+                color: 'var(--text-light)',
+                fontFamily: 'var(--font-family)'
+            }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <Tooltip title="Sunlight settings">
                         <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <WbSunny />
-                            <span style={{ marginLeft: 8 }}>Sunlight Settings</span>
+                            <WbSunny sx={{ color: 'var(--text-light)' }} />
+                            <span style={{ marginLeft: 8, color: 'var(--text-light)' }}>Sunlight Settings</span>
                         </div>
                     </Tooltip>
                     <Tooltip title="Adjust sunlight time">
-                        <IconButton onClick={handleExpandClick} style={{ marginLeft: 'auto' }}>
+                        <IconButton 
+                            onClick={handleExpandClick} 
+                            style={{ marginLeft: 'auto' }}
+                            sx={{ color: 'var(--text-light)' }}
+                        >
                             {expanded ? <ExpandLess /> : <ExpandMore />}
                         </IconButton>
                     </Tooltip>
                 </div>
             </Paper>
             <Collapse in={expanded}>
-                <Paper style={{ padding: 16, marginTop: 8, backgroundColor: '#e0e0e0' }}>
+                <Paper style={{ 
+                    padding: 16, 
+                    marginTop: 8, 
+                    backgroundColor: 'var(--bg-light)',
+                    color: 'var(--text-light)',
+                    fontFamily: 'var(--font-family)'
+                }}>
                     <Tooltip title="Select Date" arrow>
                         <Slider
+                            sx={{
+                                color: 'var(--slider-color)',
+                                '& .MuiSlider-valueLabel': {
+                                    color: 'var(--text-light)',
+                                    backgroundColor: 'var(--bg-light)',
+                                    fontFamily: 'var(--font-family)'
+                                }
+                            }}
                             value={DateTime.fromMillis(sunlightTime).setZone('Europe/Stockholm').startOf('day').toMillis()}
                             onChange={handleDateChange}
                             min={DateTime.local().setZone('Europe/Stockholm').startOf('year').toMillis()}
@@ -89,6 +112,14 @@ const SunlightSlider: React.FC<SunlightSliderProps> = ({ sunlightTime, onSliderC
                     </Tooltip>
                     <Tooltip title="Select Time" arrow>
                         <Slider
+                            sx={{
+                                color: 'var(--slider-color)',
+                                '& .MuiSlider-valueLabel': {
+                                    color: 'var(--text-light)',
+                                    backgroundColor: 'var(--bg-light)',
+                                    fontFamily: 'var(--font-family)'
+                                }
+                            }}
                             value={DateTime.fromMillis(sunlightTime).setZone('Europe/Stockholm').diff(DateTime.fromMillis(sunlightTime).setZone('Europe/Stockholm').startOf('day')).toMillis()}
                             onChange={handleTimeChange}
                             min={0}
@@ -100,30 +131,50 @@ const SunlightSlider: React.FC<SunlightSliderProps> = ({ sunlightTime, onSliderC
                     </Tooltip>
                     <Button
                         variant="contained"
-                        color="primary"
+                        sx={{ 
+                            marginTop: 1,
+                            bgcolor: 'var(--accent-primary)',
+                            color: 'var(--button-text-primary)',
+                            fontFamily: 'var(--font-family)',
+                            '&:disabled': {
+                                bgcolor: 'var(--accent-disabled)'
+                            }
+                        }}
                         startIcon={<WbSunny />}
                         onClick={animateSun}
                         disabled={animating}
-                        style={{ marginTop: 8 }}
                     >
                         Animate Sun
                     </Button>
                     <Button
                         variant="contained"
-                        color="secondary"
+                        sx={{ 
+                            marginTop: 1,
+                            marginLeft: 1,
+                            bgcolor: 'var(--accent-secondary)',
+                            color: 'var(--button-text-primary)',
+                            fontFamily: 'var(--font-family)',
+                            '&:disabled': {
+                                bgcolor: 'var(--accent-disabled)'
+                            }
+                        }}
                         startIcon={<Stop />}
                         onClick={stopAnimation}
                         disabled={!animating}
-                        style={{ marginTop: 8, marginLeft: 8 }}
                     >
                         Stop Animation
                     </Button>
                     <Button
                         variant="contained"
-                        color="inherit"
+                        sx={{ 
+                            marginTop: 1,
+                            marginLeft: 1,
+                            bgcolor: 'var(--bg-light)',
+                            color: 'var(--text-light)',
+                            fontFamily: 'var(--font-family)'
+                        }}
                         startIcon={<AccessTime />}
                         onClick={setToCurrentTime}
-                        style={{ marginTop: 8, marginLeft: 8 }}
                     >
                         Now
                     </Button>

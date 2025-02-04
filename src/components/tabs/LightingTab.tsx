@@ -25,23 +25,26 @@ const LightingTab: React.FC = () => {
                 Lighting Setup
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="body1" gutterBottom sx={{ flexGrow: 1, color: '#1E1E2D' }}>
+                <Typography variant="body1" gutterBottom>
                     Sunlight
                 </Typography>
-                <Switch checked={sunlight} onChange={handleSunlightToggle} sx={{ color: '#FFFFFF' }} />
+                <Switch 
+                    checked={sunlight} 
+                    onChange={handleSunlightToggle}
+                />
             </Box>
-            <Typography variant="body1" gutterBottom sx={{ color: '#1E1E2D' }}>
+            <Typography variant="body1" gutterBottom>
                 Sun Color
             </Typography>
-            <Slider value={sunColor} onChange={handleSliderChange(setSunColor)} sx={{ color: '#FFFFFF' }} />
-            <Typography variant="body1" gutterBottom sx={{ color: '#1E1E2D' }}>
+            <Slider value={sunColor} onChange={handleSliderChange(setSunColor)} />
+            <Typography variant="body1" gutterBottom>
                 Diffuse Color
             </Typography>
-            <Slider value={diffuseColor} onChange={handleSliderChange(setDiffuseColor)} sx={{ color: '#FFFFFF' }} />
-            <Typography variant="body1" gutterBottom sx={{ color: '#1E1E2D' }}>
+            <Slider value={diffuseColor} onChange={handleSliderChange(setDiffuseColor)} />
+            <Typography variant="body1" gutterBottom>
                 Shadow Color
             </Typography>
-            <Slider value={shadowColor} onChange={handleSliderChange(setShadowColor)} sx={{ color: '#FFFFFF' }} />
+            <Slider value={shadowColor} onChange={handleSliderChange(setShadowColor)} />
             {/* Add live preview of lighting changes here */}
         </Box>
     );

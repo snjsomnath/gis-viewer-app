@@ -65,6 +65,41 @@ const MapViewer: React.FC = () => {
         'hbjson-glb-layer': true
     }));
 
+    const [isDarkMode, setIsDarkMode] = useState(false);
+    
+    // Update basemap style when theme changes
+    const currentBasemapStyle = useMemo(() => {
+        return isDarkMode ? 
+            'mapbox://styles/mapbox/dark-v10' : 
+            'mapbox://styles/mapbox/light-v10';
+    }, [isDarkMode]);
+
+    const handleBasemapChange = useCallback((style: string) => {
+        setBasemapStyle(style);
+    }, []);
+
+    // Theme toggle handler
+    const toggleTheme = useCallback(() => {
+        setIsDarkMode(prev => {
+            const newTheme = !prev;
+            document.documentElement.setAttribute(
+                'data-theme',
+                newTheme ? 'dark' : 'light'
+            );
+            handleBasemapChange(
+                newTheme ? 
+                'mapbox://styles/mapbox/dark-v10' : 
+                'mapbox://styles/mapbox/light-v10'
+            );
+            return newTheme;
+        });
+    }, [handleBasemapChange]);
+
+    // Initialize theme
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }, []);
+
     // Load GIS Data once
     useEffect(() => {
         const fetchData = async () => {
@@ -113,10 +148,6 @@ const MapViewer: React.FC = () => {
         if (params.viewState) {
             setViewState(params.viewState);
         }
-    }, []);
-
-    const handleBasemapChange = useCallback((style: string) => {
-        setBasemapStyle(style);
     }, []);
 
     const handleVisibilityToggle = useCallback((layerId: string) => {
@@ -172,6 +203,13 @@ const MapViewer: React.FC = () => {
                     title={`${showBasemap ? 'Hide' : 'Show'} basemap`}
                 >
                     <i className="fas fa-map"></i>
+                </button>
+                <button 
+                    className="theme-toggle-btn"
+                    onClick={toggleTheme}
+                    title={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
+                >
+                    <i className={`fas fa-${isDarkMode ? 'sun' : 'moon'}`}></i>
                 </button>
             </div>
             {gisData && <RightDrawer geojsonData={gisData} />}

@@ -15,11 +15,21 @@ const ImportDataTab: React.FC = () => {
             <Typography variant="h5" gutterBottom sx={{ color: '#1E1E2D' }}>
                 Import Data
             </Typography>
-            <Box sx={{ border: '2px dashed #ccc', p: 2, textAlign: 'center' }}>
+            <Box sx={{ 
+                border: '2px dashed var(--upload-border)', 
+                p: 2, 
+                textAlign: 'center',
+                '&:hover': {
+                    borderColor: 'var(--accent-hover)'
+                }
+            }}>
                 <Typography variant="body1" gutterBottom sx={{ color: '#1E1E2D' }}>
                     Drag and drop your geoJSON files here
                 </Typography>
-                <Button variant="contained" component="label" sx={{ backgroundColor: '#FFFFFF', color: '#1E1E2D' }}>
+                <Button 
+                    variant="contained" 
+                    component="label"
+                >
                     Click to Upload
                     <input type="file" hidden onChange={handleFileUpload} />
                 </Button>
